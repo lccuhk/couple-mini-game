@@ -5,6 +5,383 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>石头剪刀布对战</title>
     <style>
+        :root {
+            --bg-gradient-1: #ffecd2;
+            --bg-gradient-2: #fcb69f;
+            --bg-gradient-3: #ffd89b;
+            --primary-color: #e65100;
+            --secondary-color: #f57c00;
+            --accent-color: #bf360c;
+            --btn-gradient-1: #ff7f50;
+            --btn-gradient-2: #ff6347;
+            --btn-shadow: rgba(255, 127, 80, 0.4);
+            --btn-shadow-hover: rgba(255, 127, 80, 0.6);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(255, 165, 0, 0.4);
+            --card-hover-border: #ff7f50;
+            --card-shadow: rgba(255, 127, 80, 0.3);
+            --text-primary: #4e342e;
+            --text-secondary: #6d4c41;
+            --tag-bg-1: #fff3e0;
+            --tag-bg-2: #ffe0b2;
+            --tag-text: #ef6c00;
+            --divider-color: #ffcc80;
+            --link-color: #e65100;
+            --decoration-1: '🧡';
+            --decoration-2: '🍊';
+        }
+
+        [data-theme="sakura"] {
+            --bg-gradient-1: #ff9a9e;
+            --bg-gradient-2: #fecfef;
+            --bg-gradient-3: #fecfef;
+            --primary-color: #d63384;
+            --secondary-color: #c2185b;
+            --accent-color: #8b4513;
+            --btn-gradient-1: #ff6b9d;
+            --btn-gradient-2: #c44569;
+            --btn-shadow: rgba(255, 107, 157, 0.4);
+            --btn-shadow-hover: rgba(255, 107, 157, 0.6);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(255, 182, 193, 0.5);
+            --card-hover-border: #ff6b9d;
+            --card-shadow: rgba(255, 107, 157, 0.3);
+            --text-primary: #5a3a3a;
+            --text-secondary: #7a5a5a;
+            --tag-bg-1: #ffe0e9;
+            --tag-bg-2: #ffd1dc;
+            --tag-text: #c2185b;
+            --divider-color: #ffb6c1;
+            --link-color: #d63384;
+            --decoration-1: '💕';
+            --decoration-2: '💖';
+        }
+
+        [data-theme="lavender"] {
+            --bg-gradient-1: #a8edea;
+            --bg-gradient-2: #fed6e3;
+            --bg-gradient-3: #d299c2;
+            --primary-color: #7b1fa2;
+            --secondary-color: #9c27b0;
+            --accent-color: #4a148c;
+            --btn-gradient-1: #ba68c8;
+            --btn-gradient-2: #9c27b0;
+            --btn-shadow: rgba(186, 104, 200, 0.4);
+            --btn-shadow-hover: rgba(186, 104, 200, 0.6);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(186, 104, 200, 0.4);
+            --card-hover-border: #ba68c8;
+            --card-shadow: rgba(186, 104, 200, 0.3);
+            --text-primary: #4a148c;
+            --text-secondary: #6a1b9a;
+            --tag-bg-1: #f3e5f5;
+            --tag-bg-2: #e1bee7;
+            --tag-text: #7b1fa2;
+            --divider-color: #ce93d8;
+            --link-color: #7b1fa2;
+            --decoration-1: '💜';
+            --decoration-2: '🔮';
+        }
+
+        [data-theme="ocean"] {
+            --bg-gradient-1: #a1c4fd;
+            --bg-gradient-2: #c2e9fb;
+            --bg-gradient-3: #89f7fe;
+            --primary-color: #1565c0;
+            --secondary-color: #1976d2;
+            --accent-color: #0d47a1;
+            --btn-gradient-1: #42a5f5;
+            --btn-gradient-2: #1e88e5;
+            --btn-shadow: rgba(66, 165, 245, 0.4);
+            --btn-shadow-hover: rgba(66, 165, 245, 0.6);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(66, 165, 245, 0.4);
+            --card-hover-border: #42a5f5;
+            --card-shadow: rgba(66, 165, 245, 0.3);
+            --text-primary: #0d47a1;
+            --text-secondary: #1565c0;
+            --tag-bg-1: #e3f2fd;
+            --tag-bg-2: #bbdefb;
+            --tag-text: #1565c0;
+            --divider-color: #90caf9;
+            --link-color: #1565c0;
+            --decoration-1: '💙';
+            --decoration-2: '🌊';
+        }
+
+        [data-theme="forest"] {
+            --bg-gradient-1: #a8e063;
+            --bg-gradient-2: #56ab2f;
+            --bg-gradient-3: #a8e063;
+            --primary-color: #2e7d32;
+            --secondary-color: #388e3c;
+            --accent-color: #1b5e20;
+            --btn-gradient-1: #66bb6a;
+            --btn-gradient-2: #388e3c;
+            --btn-shadow: rgba(102, 187, 106, 0.4);
+            --btn-shadow-hover: rgba(102, 187, 106, 0.6);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(102, 187, 106, 0.4);
+            --card-hover-border: #66bb6a;
+            --card-shadow: rgba(102, 187, 106, 0.3);
+            --text-primary: #1b5e20;
+            --text-secondary: #2e7d32;
+            --tag-bg-1: #e8f5e9;
+            --tag-bg-2: #c8e6c9;
+            --tag-text: #2e7d32;
+            --divider-color: #a5d6a7;
+            --link-color: #2e7d32;
+            --decoration-1: '💚';
+            --decoration-2: '🌿';
+        }
+
+        [data-theme="midnight"] {
+            --bg-gradient-1: #232526;
+            --bg-gradient-2: #414345;
+            --bg-gradient-3: #232526;
+            --primary-color: #ffd700;
+            --secondary-color: #ffc107;
+            --accent-color: #ff8f00;
+            --btn-gradient-1: #ffd700;
+            --btn-gradient-2: #ffc107;
+            --btn-shadow: rgba(255, 215, 0, 0.4);
+            --btn-shadow-hover: rgba(255, 215, 0, 0.6);
+            --card-bg: rgba(50, 50, 50, 0.9);
+            --card-border: rgba(255, 215, 0, 0.3);
+            --card-hover-border: #ffd700;
+            --card-shadow: rgba(255, 215, 0, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --tag-bg-1: #424242;
+            --tag-bg-2: #616161;
+            --tag-text: #ffd700;
+            --divider-color: #ffd700;
+            --link-color: #ffd700;
+            --decoration-1: '⭐';
+            --decoration-2: '🌙';
+        }
+
+        [data-mode="dark"] {
+            --card-bg: rgba(30, 30, 30, 0.9);
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+        }
+
+        [data-mode="dark"][data-theme="orange"] {
+            --bg-gradient-1: #1a0f00;
+            --bg-gradient-2: #2d1810;
+            --bg-gradient-3: #1a0f00;
+            --card-bg: rgba(40, 30, 20, 0.9);
+        }
+
+        [data-mode="dark"][data-theme="sakura"] {
+            --bg-gradient-1: #1a0a10;
+            --bg-gradient-2: #2d1020;
+            --bg-gradient-3: #1a0a10;
+            --card-bg: rgba(40, 20, 30, 0.9);
+        }
+
+        [data-mode="dark"][data-theme="lavender"] {
+            --bg-gradient-1: #0f0a1a;
+            --bg-gradient-2: #1a102d;
+            --bg-gradient-3: #0f0a1a;
+            --card-bg: rgba(30, 20, 40, 0.9);
+        }
+
+        [data-mode="dark"][data-theme="ocean"] {
+            --bg-gradient-1: #0a0f1a;
+            --bg-gradient-2: #101a2d;
+            --bg-gradient-3: #0a0f1a;
+            --card-bg: rgba(20, 30, 40, 0.9);
+        }
+
+        [data-mode="dark"][data-theme="forest"] {
+            --bg-gradient-1: #0a1a0f;
+            --bg-gradient-2: #102d1a;
+            --bg-gradient-3: #0a1a0f;
+            --card-bg: rgba(20, 40, 30, 0.9);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .theme-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--btn-gradient-1), var(--btn-gradient-2));
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--btn-shadow);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 6px 20px var(--btn-shadow-hover);
+        }
+
+        .theme-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 2px solid var(--card-border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            min-width: 280px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-panel.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .theme-panel h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .theme-section {
+            margin-bottom: 1.2rem;
+        }
+
+        .theme-section-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.6rem;
+            font-weight: 500;
+        }
+
+        .color-themes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .color-theme-btn {
+            padding: 0.5rem;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            color: white;
+            font-weight: 500;
+        }
+
+        .color-theme-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .color-theme-btn.active {
+            border-color: white;
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+
+        .color-theme-btn[data-theme="orange"] {
+            background: linear-gradient(135deg, #ff7f50, #ff6347);
+        }
+
+        .color-theme-btn[data-theme="sakura"] {
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+        }
+
+        .color-theme-btn[data-theme="lavender"] {
+            background: linear-gradient(135deg, #ba68c8, #9c27b0);
+        }
+
+        .color-theme-btn[data-theme="ocean"] {
+            background: linear-gradient(135deg, #42a5f5, #1e88e5);
+        }
+
+        .color-theme-btn[data-theme="forest"] {
+            background: linear-gradient(135deg, #66bb6a, #388e3c);
+        }
+
+        .color-theme-btn[data-theme="midnight"] {
+            background: linear-gradient(135deg, #232526, #414345);
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border: 2px solid var(--card-border);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--btn-gradient-1);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, var(--btn-gradient-1), var(--btn-gradient-2));
+            color: white;
+            border-color: transparent;
+        }
+
+        body {
+            transition: all 0.5s ease;
+        }
+
+        body::before {
+            content: var(--decoration-1);
+            position: fixed;
+            top: 10%;
+            left: 5%;
+            font-size: 3rem;
+            opacity: 0.3;
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: var(--decoration-2);
+            position: fixed;
+            top: 60%;
+            right: 5%;
+            font-size: 2.5rem;
+            opacity: 0.3;
+            animation: float 8s ease-in-out infinite reverse;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -263,7 +640,35 @@
         }
     </style>
 </head>
-<body>
+<body data-theme="orange" data-mode="light">
+    <div class="theme-toggle">
+        <button class="theme-btn" id="themeBtn" title="切换主题">🎨</button>
+    </div>
+
+    <div class="theme-panel" id="themePanel">
+        <h3>🎨 主题设置</h3>
+        
+        <div class="theme-section">
+            <div class="theme-section-title">选择颜色</div>
+            <div class="color-themes">
+                <button class="color-theme-btn" data-theme="orange">🍊 橘色</button>
+                <button class="color-theme-btn" data-theme="sakura">🌸 粉色</button>
+                <button class="color-theme-btn" data-theme="lavender">💜 紫色</button>
+                <button class="color-theme-btn" data-theme="ocean">💙 蓝色</button>
+                <button class="color-theme-btn" data-theme="forest">💚 绿色</button>
+                <button class="color-theme-btn" data-theme="midnight">🌙 暗夜</button>
+            </div>
+        </div>
+        
+        <div class="theme-section">
+            <div class="theme-section-title">显示模式</div>
+            <div class="mode-toggle">
+                <button class="mode-btn" data-mode="light">☀️ 浅色</button>
+                <button class="mode-btn" data-mode="dark">🌙 深色</button>
+            </div>
+        </div>
+    </div>
+
     <button class="back-btn" onclick="location.href='../index.html'">← 返回</button>
     
     <div class="game-container">
@@ -478,6 +883,63 @@
 
         nextRoundBtn.addEventListener('click', nextRound);
         resetBtn.addEventListener('click', resetGame);
+    </script>
+
+    <script>
+        (function() {
+            const themeBtn = document.getElementById('themeBtn');
+            const themePanel = document.getElementById('themePanel');
+            const colorThemeBtns = document.querySelectorAll('.color-theme-btn');
+            const modeBtns = document.querySelectorAll('.mode-btn');
+            const body = document.body;
+
+            const savedTheme = localStorage.getItem('couple-game-theme') || 'orange';
+            const savedMode = localStorage.getItem('couple-game-mode') || 'light';
+
+            function applyTheme(theme, mode) {
+                body.setAttribute('data-theme', theme);
+                body.setAttribute('data-mode', mode);
+                
+                colorThemeBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.theme === theme);
+                });
+                
+                modeBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.mode === mode);
+                });
+
+                localStorage.setItem('couple-game-theme', theme);
+                localStorage.setItem('couple-game-mode', mode);
+            }
+
+            applyTheme(savedTheme, savedMode);
+
+            themeBtn.addEventListener('click', () => {
+                themePanel.classList.toggle('active');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!themePanel.contains(e.target) && !themeBtn.contains(e.target)) {
+                    themePanel.classList.remove('active');
+                }
+            });
+
+            colorThemeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const theme = btn.dataset.theme;
+                    const mode = body.getAttribute('data-mode');
+                    applyTheme(theme, mode);
+                });
+            });
+
+            modeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const theme = body.getAttribute('data-theme');
+                    const mode = btn.dataset.mode;
+                    applyTheme(theme, mode);
+                });
+            });
+        })();
     </script>
 </body>
 </html>
