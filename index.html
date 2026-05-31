@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>双人小游戏合集 - Couple Mini Games</title>
+    <title>💑 情侣小游戏 - 属于我们的甜蜜时光</title>
     <style>
         * {
             margin: 0;
@@ -12,16 +12,47 @@
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            color: #5a3a3a;
             padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '💕';
+            position: fixed;
+            top: 10%;
+            left: 5%;
+            font-size: 3rem;
+            opacity: 0.3;
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '💖';
+            position: fixed;
+            top: 60%;
+            right: 5%;
+            font-size: 2.5rem;
+            opacity: 0.3;
+            animation: float 8s ease-in-out infinite reverse;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         header {
@@ -29,151 +60,247 @@
             margin-bottom: 3rem;
         }
 
-        h1 {
-            font-size: 3rem;
+        .hearts {
+            font-size: 2rem;
             margin-bottom: 0.5rem;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #ffd700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            letter-spacing: 0.5rem;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.8rem;
+            color: #d63384;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+            font-weight: 700;
         }
 
         .subtitle {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.3rem;
+            color: #c2185b;
             margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: #8b4513;
+            font-style: italic;
+            margin-bottom: 1.5rem;
         }
 
         .game-count {
             display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+            padding: 0.6rem 1.8rem;
+            border-radius: 30px;
             font-size: 1rem;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .category {
+            margin-bottom: 2.5rem;
+        }
+
+        .category-title {
+            font-size: 1.6rem;
+            margin-bottom: 1.2rem;
+            padding-left: 1rem;
+            border-left: 4px solid #ff6b9d;
+            color: #d63384;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
 
         .game-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.85);
             border-radius: 20px;
-            padding: 1.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 1.8rem;
+            border: 2px solid rgba(255, 182, 193, 0.5);
             backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             text-decoration: none;
-            color: white;
+            color: #5a3a3a;
             display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        .game-card:hover::before {
+            left: 100%;
         }
 
         .game-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(255, 107, 157, 0.3);
+            border-color: #ff6b9d;
+            background: rgba(255, 255, 255, 0.95);
         }
 
         .game-icon {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
+            font-size: 3.5rem;
+            margin-bottom: 0.8rem;
             display: block;
+            transition: transform 0.3s;
+        }
+
+        .game-card:hover .game-icon {
+            transform: scale(1.2) rotate(5deg);
         }
 
         .game-number {
             display: inline-block;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
-            padding: 0.2rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
         }
 
         .game-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            color: #d63384;
         }
 
         .game-desc {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.5;
-            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            color: #7a5a5a;
+            line-height: 1.6;
+            margin-bottom: 1.2rem;
         }
 
         .game-tags {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
+            margin-bottom: 1rem;
         }
 
         .tag {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.2rem 0.6rem;
-            border-radius: 10px;
-            font-size: 0.75rem;
+            background: linear-gradient(135deg, #ffe0e9, #ffd1dc);
+            color: #c2185b;
+            padding: 0.25rem 0.7rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
         }
 
         .play-btn {
             display: inline-block;
-            margin-top: 1rem;
-            padding: 0.6rem 1.5rem;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            transition: transform 0.2s;
+            margin-top: 0.5rem;
+            padding: 0.7rem 1.8rem;
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
         }
 
         .game-card:hover .play-btn {
             transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .play-btn::after {
+            content: ' 💕';
         }
 
         footer {
             text-align: center;
-            padding: 2rem;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
+            padding: 2.5rem 2rem 2rem;
+            color: #a0522d;
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        footer::before {
+            content: '💑';
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
         }
 
         footer a {
-            color: #4ecdc4;
+            color: #d63384;
             text-decoration: none;
+            font-weight: 500;
         }
 
         footer a:hover {
             text-decoration: underline;
         }
 
-        .category {
-            margin-bottom: 2rem;
+        .love-quote {
+            margin-top: 1rem;
+            font-style: italic;
+            color: #8b4513;
+            font-size: 0.9rem;
         }
 
-        .category-title {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            padding-left: 1rem;
-            border-left: 4px solid #4ecdc4;
+        .divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            color: #ff6b9d;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffb6c1, transparent);
         }
 
         @media (max-width: 600px) {
             h1 {
                 font-size: 2rem;
             }
+            .subtitle {
+                font-size: 1.1rem;
+            }
             .games-grid {
                 grid-template-columns: 1fr;
             }
             .game-card {
-                padding: 1.2rem;
+                padding: 1.5rem;
+            }
+            .category-title {
+                font-size: 1.3rem;
+            }
+            body::before,
+            body::after {
+                font-size: 2rem;
             }
         }
     </style>
@@ -181,160 +308,167 @@
 <body>
     <div class="container">
         <header>
-            <h1>🎮 双人小游戏合集</h1>
-            <p class="subtitle">Couple Mini Games - 适合情侣/朋友一起玩的 10 款双人小游戏</p>
-            <span class="game-count">🎉 共 10 款游戏</span>
+            <div class="hearts">💕 💖 💕</div>
+            <h1>情侣小游戏合集</h1>
+            <p class="subtitle">属于我们的甜蜜时光 ✨</p>
+            <p class="tagline">"游戏是暂时的，但我们的快乐是永远的~"</p>
+            <span class="game-count">🎮 共 10 款甜蜜游戏</span>
         </header>
 
+        <div class="divider">💝</div>
+
         <div class="category">
-            <h2 class="category-title">🎯 经典对战</h2>
+            <h2 class="category-title">🎯 甜蜜对战</h2>
             <div class="games-grid">
                 <a href="games/01_pong.html" class="game-card">
                     <span class="game-number">游戏 01</span>
                     <span class="game-icon">🏓</span>
                     <h3 class="game-title">乒乓球对战</h3>
-                    <p class="game-desc">经典的乒乓球游戏，使用键盘控制球拍，先得5分获胜。支持音效、倒计时和获胜庆祝动画！</p>
+                    <p class="game-desc">经典的乒乓球游戏，看看谁才是真正的乒乓之王！输的人要接受小惩罚哦~</p>
                     <div class="game-tags">
                         <span class="tag">动作</span>
                         <span class="tag">竞技</span>
-                        <span class="tag">2人</span>
+                        <span class="tag">双人</span>
                     </div>
-                    <span class="play-btn">▶️ 开始游戏</span>
+                    <span class="play-btn">开始游戏</span>
                 </a>
 
                 <a href="games/02_tic_tac_toe.html" class="game-card">
                     <span class="game-number">游戏 02</span>
                     <span class="game-icon">❌⭕</span>
                     <h3 class="game-title">井字棋</h3>
-                    <p class="game-desc">经典的三连棋游戏，轮流下棋，先连成三子一线者获胜。支持比分记录和重置功能。</p>
+                    <p class="game-desc">简单又经典的三连棋，输的人要答应对方一个小要求~ 三局两胜制！</p>
                     <div class="game-tags">
                         <span class="tag">策略</span>
                         <span class="tag">益智</span>
-                        <span class="tag">2人</span>
+                        <span class="tag">双人</span>
                     </div>
-                    <span class="play-btn">▶️ 开始游戏</span>
+                    <span class="play-btn">开始游戏</span>
                 </a>
 
                 <a href="games/07_connect_four.html" class="game-card">
                     <span class="game-number">游戏 07</span>
                     <span class="game-icon">🔴🔵</span>
                     <h3 class="game-title">四子棋</h3>
-                    <p class="game-desc">策略对战游戏，轮流投放棋子，先连成四子一线者获胜。带有预览和获胜动画！</p>
+                    <p class="game-desc">策略对战游戏，谁先连成四子谁就赢！考验我们的默契和智力~</p>
                     <div class="game-tags">
                         <span class="tag">策略</span>
                         <span class="tag">益智</span>
-                        <span class="tag">2人</span>
+                        <span class="tag">双人</span>
                     </div>
-                    <span class="play-btn">▶️ 开始游戏</span>
+                    <span class="play-btn">开始游戏</span>
                 </a>
             </div>
         </div>
 
         <div class="category">
-            <h2 class="category-title">🐍 动作竞技</h2>
+            <h2 class="category-title">🔥 激情竞技</h2>
             <div class="games-grid">
                 <a href="games/04_snake_battle.html" class="game-card">
                     <span class="game-number">游戏 04</span>
                     <span class="game-icon">🐍</span>
-                    <h3 class="game-title">贪吃蛇对战</h3>
-                    <p class="game-desc">双人版贪吃蛇！控制各自的蛇吃食物长大，撞到边界、自己或对方的蛇就输了。</p>
+                    <h3 class="game-title">贪吃蛇大作战</h3>
+                    <p class="game-desc">双人版贪吃蛇！控制各自的蛇吃食物长大，谁先撞到谁就输啦~</p>
                     <div class="game-tags">
                         <span class="tag">动作</span>
                         <span class="tag">竞技</span>
-                        <span class="tag">2人</span>
+                        <span class="tag">双人</span>
                     </div>
-                    <span class="play-btn">▶️ 开始游戏</span>
+                    <span class="play-btn">开始游戏</span>
                 </a>
 
                 <a href="games/05_shooter_battle.html" class="game-card">
                     <span class="game-number">游戏 05</span>
                     <span class="game-icon">🎯</span>
                     <h3 class="game-title">射击对战</h3>
-                    <p class="game-desc">双人射击对战！在各自的区域移动，发射子弹击中对方得分，先得5分获胜。</p>
+                    <p class="game-desc">双人射击对战！看看谁的枪法更准，输的人要给赢的人按摩~</p>
                     <div class="game-tags">
                         <span class="tag">射击</span>
                         <span class="tag">动作</span>
-                        <span class="tag">2人</span>
+                        <span class="tag">双人</span>
                     </div>
-                    <span class="play-btn">▶️ 开始游戏</span>
+                    <span class="play-btn">开始游戏</span>
                 </a>
 
                 <a href="games/08_whack_a_mole.html" class="game-card">
                     <span class="game-number">游戏 08</span>
                     <span class="game-icon">🐹</span>
-                    <h3 class="game-title">打地鼠对战</h3>
-                    <p class="game-desc">30秒限时打地鼠比赛！地鼠随机出现，快速按下对应按键得分，看谁打得更多！</p>
+                    <h3 class="game-title">打地鼠比赛</h3>
+                    <p class="game-desc">30秒限时打地鼠比赛！考验我们的反应速度，输的人要做家务~</p>
                     <div class="game-tags">
                         <span class="tag">反应</span>
                         <span class="tag">竞速</span>
-                        <span class="tag">2人</span>
+                        <span class="tag">双人</span>
                     </div>
-                    <span class="play-btn">▶️ 开始游戏</span>
+                    <span class="play-btn">开始游戏</span>
                 </a>
             </div>
         </div>
 
         <div class="category">
-            <h2 class="category-title">🧠 益智反应</h2>
+            <h2 class="category-title">💑 默契考验</h2>
             <div class="games-grid">
                 <a href="games/03_rock_paper_scissors.html" class="game-card">
                     <span class="game-number">游戏 03</span>
                     <span class="game-icon">🪨📄✂️</span>
                     <h3 class="game-title">石头剪刀布</h3>
-                    <p class="game-desc">经典的猜拳游戏！两人轮流选择，石头赢剪刀，剪刀赢布，布赢石头。支持多回合对战。</p>
+                    <p class="game-desc">经典的猜拳游戏！今天谁洗碗、谁拿外卖、谁先洗澡，都由它决定！</p>
                     <div class="game-tags">
                         <span class="tag">休闲</span>
                         <span class="tag">运气</span>
-                        <span class="tag">2人</span>
+                        <span class="tag">双人</span>
                     </div>
-                    <span class="play-btn">▶️ 开始游戏</span>
+                    <span class="play-btn">开始游戏</span>
                 </a>
 
                 <a href="games/06_memory_match.html" class="game-card">
                     <span class="game-number">游戏 06</span>
                     <span class="game-icon">🃏</span>
                     <h3 class="game-title">记忆翻牌</h3>
-                    <p class="game-desc">考验记忆力的翻牌游戏！轮流翻开两张牌，配对成功得分，得分多者获胜。</p>
+                    <p class="game-desc">考验我们的记忆力！看看谁更懂对方，能记住更多的牌~</p>
                     <div class="game-tags">
                         <span class="tag">记忆</span>
                         <span class="tag">益智</span>
-                        <span class="tag">2人</span>
+                        <span class="tag">双人</span>
                     </div>
-                    <span class="play-btn">▶️ 开始游戏</span>
+                    <span class="play-btn">开始游戏</span>
                 </a>
 
                 <a href="games/09_reaction_test.html" class="game-card">
                     <span class="game-number">游戏 09</span>
                     <span class="game-icon">⚡</span>
-                    <h3 class="game-title">反应力测试</h3>
-                    <p class="game-desc">测试你们的反应速度！看到绿色后立即按下按键，反应更快的玩家得分。注意不要抢跑哦！</p>
+                    <h3 class="game-title">反应力大比拼</h3>
+                    <p class="game-desc">测试我们的反应速度！谁更快谁就有奖励，慢的人要接受小惩罚哦~</p>
                     <div class="game-tags">
                         <span class="tag">反应</span>
                         <span class="tag">测试</span>
-                        <span class="tag">2人</span>
+                        <span class="tag">双人</span>
                     </div>
-                    <span class="play-btn">▶️ 开始游戏</span>
+                    <span class="play-btn">开始游戏</span>
                 </a>
 
                 <a href="games/10_number_bomb.html" class="game-card">
                     <span class="game-number">游戏 10</span>
                     <span class="game-icon">💣</span>
                     <h3 class="game-title">数字炸弹</h3>
-                    <p class="game-desc">猜数字游戏！轮流猜1-100之间的数字，猜中炸弹的人输。范围会逐渐缩小，紧张刺激！</p>
+                    <p class="game-desc">紧张刺激的猜数字游戏！谁猜中炸弹谁就输了，输的人要实现对方一个愿望~</p>
                     <div class="game-tags">
                         <span class="tag">策略</span>
                         <span class="tag">运气</span>
-                        <span class="tag">2人</span>
+                        <span class="tag">双人</span>
                     </div>
-                    <span class="play-btn">▶️ 开始游戏</span>
+                    <span class="play-btn">开始游戏</span>
                 </a>
             </div>
         </div>
 
+        <div class="divider">💖</div>
+
         <footer>
-            <p>💝 专为情侣和朋友设计的双人小游戏合集</p>
-            <p>GitHub: <a href="https://github.com/lccuhk/couple-mini-game" target="_blank">lccuhk/couple-mini-game</a></p>
-            <p style="margin-top: 0.5rem;">Made with ❤️ using HTML, CSS, JavaScript</p>
+            <p>💑 专属于我们的双人小游戏合集</p>
+            <p style="margin-top: 0.5rem;">GitHub: <a href="https://github.com/lccuhk/couple-mini-game" target="_blank">lccuhk/couple-mini-game</a></p>
+            <p class="love-quote">"最好的爱情，就是一起玩很多很多的游戏，走很长很长的路~"</p>
+            <p style="margin-top: 1rem; font-size: 0.85rem; color: #c2185b;">Made with 💕 for us</p>
         </footer>
     </div>
 </body>
