@@ -1488,15 +1488,6 @@
             gameStatusEl.className = 'game-status';
         }
 
-        function togglePause() {
-            gamePaused = !gamePaused;
-            if (gamePaused) {
-                gameStatusEl.textContent = '⏸️ 游戏暂停 - 按空格键继续';
-            } else {
-                gameStatusEl.textContent = '游戏进行中...';
-            }
-        }
-
         function resetGame() {
             gameRunning = false;
             gamePaused = false;
