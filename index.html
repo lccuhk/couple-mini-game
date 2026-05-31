@@ -410,6 +410,73 @@
             transform: scale(0.98);
         }
 
+        .nickname-section {
+            margin-bottom: 1.2rem;
+        }
+
+        .nickname-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .nickname-input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .nickname-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            min-width: 60px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .nickname-input {
+            flex: 1;
+            padding: 0.5rem 0.8rem;
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .nickname-input:focus {
+            outline: none;
+            border-color: var(--btn-gradient-1);
+        }
+
+        .nickname-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .save-nickname-btn {
+            width: 100%;
+            padding: 0.6rem;
+            border: 2px solid var(--card-border);
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--btn-gradient-1), var(--btn-gradient-2));
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .save-nickname-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px var(--btn-shadow);
+        }
+
+        .save-nickname-btn:active {
+            transform: scale(0.98);
+        }
+
         .mode-btn {
             flex: 1;
             padding: 0.6rem;
@@ -723,6 +790,23 @@
         </div>
 
         <div class="theme-section">
+            <div class="theme-section-title">👫 玩家昵称</div>
+            <div class="nickname-section">
+                <div class="nickname-input-group">
+                    <span class="nickname-label">👤 玩家1</span>
+                    <input type="text" class="nickname-input" id="player1Name" placeholder="输入昵称" maxlength="10">
+                </div>
+                <div class="nickname-input-group">
+                    <span class="nickname-label">👤 玩家2</span>
+                    <input type="text" class="nickname-input" id="player2Name" placeholder="输入昵称" maxlength="10">
+                </div>
+                <button class="save-nickname-btn" id="saveNicknameBtn">
+                    💾 保存昵称
+                </button>
+            </div>
+        </div>
+
+        <div class="theme-section">
             <button class="random-theme-btn" id="randomThemeBtn">
                 🎲 随机主题
             </button>
@@ -901,10 +985,15 @@
         const randomThemeBtn = document.getElementById('randomThemeBtn');
         const colorThemeBtns = document.querySelectorAll('.color-theme-btn');
         const modeBtns = document.querySelectorAll('.mode-btn');
+        const player1NameInput = document.getElementById('player1Name');
+        const player2NameInput = document.getElementById('player2Name');
+        const saveNicknameBtn = document.getElementById('saveNicknameBtn');
         const body = document.body;
 
         const savedTheme = localStorage.getItem('couple-game-theme') || 'orange';
         const savedMode = localStorage.getItem('couple-game-mode') || 'light';
+        const savedPlayer1Name = localStorage.getItem('couple-game-player1') || '玩家1';
+        const savedPlayer2Name = localStorage.getItem('couple-game-player2') || '玩家2';
 
         function applyTheme(theme, mode) {
             body.setAttribute('data-theme', theme);
@@ -945,6 +1034,37 @@
 
         applyTheme(savedTheme, savedMode);
 
+        player1NameInput.value = savedPlayer1Name;
+        player2NameInput.value = savedPlayer2Name;
+
+        function updateGameLinks() {
+            const gameCards = document.querySelectorAll('.game-card');
+            const p1 = encodeURIComponent(player1NameInput.value || '玩家1');
+            const p2 = encodeURIComponent(player2NameInput.value || '玩家2');
+            
+            gameCards.forEach(card => {
+                const baseHref = card.getAttribute('href').split('?')[0];
+                card.setAttribute('href', `${baseHref}?p1=${p1}&p2=${p2}`);
+            });
+        }
+
+        updateGameLinks();
+
+        saveNicknameBtn.addEventListener('click', () => {
+            const p1 = player1NameInput.value.trim() || '玩家1';
+            const p2 = player2NameInput.value.trim() || '玩家2';
+            
+            localStorage.setItem('couple-game-player1', p1);
+            localStorage.setItem('couple-game-player2', p2);
+            
+            updateGameLinks();
+            
+            saveNicknameBtn.textContent = '✅ 已保存';
+            setTimeout(() => {
+                saveNicknameBtn.textContent = '💾 保存昵称';
+            }, 1500);
+        });
+
         themeBtn.addEventListener('click', () => {
             themePanel.classList.toggle('active');
         });
@@ -955,18 +1075,55 @@
             }
         });
 
+        let appliedTheme = savedTheme;
+        let appliedMode = savedMode;
+
+        function previewTheme(theme, mode) {
+            body.setAttribute('data-theme', theme);
+            body.setAttribute('data-mode', mode);
+        }
+
+        function restoreTheme() {
+            body.setAttribute('data-theme', appliedTheme);
+            body.setAttribute('data-mode', appliedMode);
+        }
+
         colorThemeBtns.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                const theme = btn.dataset.theme;
+                const mode = body.getAttribute('data-mode');
+                previewTheme(theme, mode);
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                restoreTheme();
+            });
+            
             btn.addEventListener('click', () => {
                 const theme = btn.dataset.theme;
                 const mode = body.getAttribute('data-mode');
+                appliedTheme = theme;
+                appliedMode = mode;
                 applyTheme(theme, mode);
             });
         });
 
         modeBtns.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                const theme = body.getAttribute('data-theme');
+                const mode = btn.dataset.mode;
+                previewTheme(theme, mode);
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                restoreTheme();
+            });
+            
             btn.addEventListener('click', () => {
                 const theme = body.getAttribute('data-theme');
                 const mode = btn.dataset.mode;
+                appliedTheme = theme;
+                appliedMode = mode;
                 applyTheme(theme, mode);
             });
         });
@@ -984,6 +1141,8 @@
                 randomThemeBtn.style.transform = '';
             }, 300);
             
+            appliedTheme = randomTheme;
+            appliedMode = currentMode;
             applyTheme(randomTheme, currentMode);
         });
     </script>

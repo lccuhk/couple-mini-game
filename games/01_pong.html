@@ -572,6 +572,133 @@
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
 
+        .pause-btn {
+            background: linear-gradient(135deg, var(--btn-gradient-1), var(--btn-gradient-2));
+            box-shadow: 0 4px 15px var(--btn-shadow);
+        }
+
+        .pause-btn:hover {
+            box-shadow: 0 6px 20px var(--btn-shadow-hover);
+        }
+
+        .pause-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .pause-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .pause-overlay h2 {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px var(--btn-shadow);
+        }
+
+        .pause-overlay .button-group {
+            gap: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .share-btn {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+        }
+
+        .share-btn:hover {
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+        }
+
+        .share-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid var(--card-border);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            display: none;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .share-modal.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .share-modal h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .share-preview {
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .share-preview canvas {
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .share-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .share-actions button {
+            flex: 1;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .download-btn:hover {
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
         .settings-panel {
             position: fixed;
             top: 50%;
@@ -879,6 +1006,8 @@
         </div>
 
         <div class="button-group">
+            <button id="pauseBtn" class="pause-btn">⏸️ 暂停</button>
+            <button id="shareBtn" class="share-btn">📸 分享战绩</button>
             <button id="restartBtn">🔄 重新开始</button>
             <button id="settingsBtn" class="secondary">⚙️ 设置</button>
         </div>
@@ -1191,6 +1320,133 @@
         
         window.addEventListener('load', () => {
             canvas.focus();
+        });
+
+        const pauseBtn = document.getElementById('pauseBtn');
+        const pauseOverlay = document.getElementById('pauseOverlay');
+        const resumeBtn = document.getElementById('resumeBtn');
+        const pauseRestartBtn = document.getElementById('pauseRestartBtn');
+        const backToMenuBtn = document.getElementById('backToMenuBtn');
+
+        function togglePause() {
+            if (!gameRunning) return;
+            
+            gamePaused = !gamePaused;
+            
+            if (gamePaused) {
+                pauseOverlay.classList.add('active');
+                pauseBtn.textContent = '▶️ 继续';
+                gameStatusEl.textContent = '⏸️ 游戏暂停 - 按空格键继续';
+            } else {
+                pauseOverlay.classList.remove('active');
+                pauseBtn.textContent = '⏸️ 暂停';
+                gameStatusEl.textContent = '游戏进行中...';
+            }
+        }
+
+        pauseBtn.addEventListener('click', togglePause);
+        resumeBtn.addEventListener('click', togglePause);
+
+        pauseRestartBtn.addEventListener('click', () => {
+            pauseOverlay.classList.remove('active');
+            gamePaused = false;
+            pauseBtn.textContent = '⏸️ 暂停';
+            resetGame();
+        });
+
+        backToMenuBtn.addEventListener('click', () => {
+            window.location.href = '../index.html';
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && gameRunning && !isCountingDown) {
+                e.preventDefault();
+                togglePause();
+            }
+        });
+
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                player1: params.get('p1') || localStorage.getItem('couple-game-player1') || '玩家1',
+                player2: params.get('p2') || localStorage.getItem('couple-game-player2') || '玩家2'
+            };
+        }
+
+        const { player1, player2 } = getUrlParams();
+
+        function generateShareImage() {
+            const canvas = document.getElementById('shareCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const gradient = ctx.createLinearGradient(0, 0, 600, 400);
+            gradient.addColorStop(0, '#ffecd2');
+            gradient.addColorStop(0.5, '#fcb69f');
+            gradient.addColorStop(1, '#ffd89b');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 600, 400);
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.beginPath();
+            ctx.roundRect(30, 30, 540, 340, 20);
+            ctx.fill();
+            
+            ctx.font = 'bold 36px Arial';
+            ctx.fillStyle = '#e65100';
+            ctx.textAlign = 'center';
+            ctx.fillText('🏓 乒乓球对战', 300, 80);
+            
+            ctx.font = '24px Arial';
+            ctx.fillStyle = '#4e342e';
+            ctx.fillText('🎮 游戏战绩', 300, 120);
+            
+            ctx.font = 'bold 28px Arial';
+            ctx.fillStyle = '#00bcd4';
+            ctx.fillText(`${player1}`, 150, 200);
+            
+            ctx.font = 'bold 48px Arial';
+            ctx.fillStyle = '#e65100';
+            ctx.fillText(`${score1} : ${score2}`, 300, 210);
+            
+            ctx.font = 'bold 28px Arial';
+            ctx.fillStyle = '#e91e63';
+            ctx.fillText(`${player2}`, 450, 200);
+            
+            const winner = score1 > score2 ? player1 : player2;
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = '#ff9800';
+            ctx.fillText(`🏆 胜利者: ${winner}`, 300, 270);
+            
+            ctx.font = '18px Arial';
+            ctx.fillStyle = '#6d4c41';
+            ctx.fillText('💑 情侣小游戏 - 属于我们的甜蜜时光', 300, 330);
+            ctx.fillText('https://lccuhk.github.io/couple-mini-game/', 300, 360);
+            
+            ctx.font = '40px Arial';
+            ctx.fillText('🧡', 80, 350);
+            ctx.fillText('🍊', 520, 350);
+        }
+
+        const shareBtn = document.getElementById('shareBtn');
+        const shareModal = document.getElementById('shareModal');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const closeShareBtn = document.getElementById('closeShareBtn');
+
+        shareBtn.addEventListener('click', () => {
+            generateShareImage();
+            shareModal.classList.add('active');
+        });
+
+        closeShareBtn.addEventListener('click', () => {
+            shareModal.classList.remove('active');
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const canvas = document.getElementById('shareCanvas');
+            const link = document.createElement('a');
+            link.download = `乒乓球战绩_${new Date().toLocaleDateString()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         });
 
         function startCountdown() {
@@ -1538,5 +1794,25 @@
 
         })();
     </script>
+
+    <div class="pause-overlay" id="pauseOverlay">
+        <h2>⏸️ 游戏暂停</h2>
+        <div class="button-group">
+            <button id="resumeBtn">▶️ 继续游戏</button>
+            <button id="pauseRestartBtn" class="secondary">🔄 重新开始</button>
+            <button id="backToMenuBtn" class="secondary">🏠 返回主页</button>
+        </div>
+    </div>
+
+    <div class="share-modal" id="shareModal">
+        <h3>📸 分享战绩</h3>
+        <div class="share-preview">
+            <canvas id="shareCanvas" width="600" height="400"></canvas>
+        </div>
+        <div class="share-actions">
+            <button id="downloadBtn" class="download-btn">💾 下载图片</button>
+            <button id="closeShareBtn" class="secondary">❌ 关闭</button>
+        </div>
+    </div>
 </body>
 </html>

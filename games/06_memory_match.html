@@ -325,6 +325,73 @@
             display: flex;
             gap: 0.5rem;
         }
+        .nickname-section {
+            margin-bottom: 1.2rem;
+        }
+
+        .nickname-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .nickname-input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .nickname-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            min-width: 60px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .nickname-input {
+            flex: 1;
+            padding: 0.5rem 0.8rem;
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .nickname-input:focus {
+            outline: none;
+            border-color: var(--btn-gradient-1);
+        }
+
+        .nickname-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .save-nickname-btn {
+            width: 100%;
+            padding: 0.6rem;
+            border: 2px solid var(--card-border);
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--btn-gradient-1), var(--btn-gradient-2));
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .save-nickname-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px var(--btn-shadow);
+        }
+
+        .save-nickname-btn:active {
+            transform: scale(0.98);
+        }
+
         .random-theme-btn {
             width: 100%;
             padding: 0.8rem;
@@ -861,6 +928,29 @@
             const themeBtn = document.getElementById('themeBtn');
             const themePanel = document.getElementById('themePanel');
             const randomThemeBtn = document.getElementById('randomThemeBtn');
+            const player1NameInput = document.getElementById('player1Name');
+            const player2NameInput = document.getElementById('player2Name');
+            const saveNicknameBtn = document.getElementById('saveNicknameBtn');
+            
+            const savedPlayer1Name = localStorage.getItem('couple-game-player1') || '玩家1';
+            const savedPlayer2Name = localStorage.getItem('couple-game-player2') || '玩家2';
+            
+            player1NameInput.value = savedPlayer1Name;
+            player2NameInput.value = savedPlayer2Name;
+            
+            saveNicknameBtn.addEventListener('click', () => {
+                const p1 = player1NameInput.value.trim() || '玩家1';
+                const p2 = player2NameInput.value.trim() || '玩家2';
+                
+                localStorage.setItem('couple-game-player1', p1);
+                localStorage.setItem('couple-game-player2', p2);
+                
+                saveNicknameBtn.textContent = '✅ 已保存';
+                setTimeout(() => {
+                    saveNicknameBtn.textContent = '💾 保存昵称';
+                }, 1500);
+            });
+
 
             const colorThemeBtns = document.querySelectorAll('.color-theme-btn');
             const modeBtns = document.querySelectorAll('.mode-btn');
@@ -886,6 +976,19 @@
             }
 
             applyTheme(savedTheme, savedMode);
+            let appliedTheme = savedTheme;
+            let appliedMode = savedMode;
+
+            function previewTheme(theme, mode) {
+                body.setAttribute('data-theme', theme);
+                body.setAttribute('data-mode', mode);
+            }
+
+            function restoreTheme() {
+                body.setAttribute('data-theme', appliedTheme);
+                body.setAttribute('data-mode', appliedMode);
+            }
+
 
             themeBtn.addEventListener('click', () => {
                 themePanel.classList.toggle('active');
@@ -897,21 +1000,49 @@
                 }
             });
 
+            
             colorThemeBtns.forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    const theme = btn.dataset.theme;
+                    const mode = body.getAttribute('data-mode');
+                    previewTheme(theme, mode);
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    restoreTheme();
+                });
+                
                 btn.addEventListener('click', () => {
                     const theme = btn.dataset.theme;
                     const mode = body.getAttribute('data-mode');
+                    appliedTheme = theme;
+                    appliedMode = mode;
                     applyTheme(theme, mode);
                 });
             });
 
+
+            
             modeBtns.forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    const theme = body.getAttribute('data-theme');
+                    const mode = btn.dataset.mode;
+                    previewTheme(theme, mode);
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    restoreTheme();
+                });
+                
                 btn.addEventListener('click', () => {
                     const theme = body.getAttribute('data-theme');
                     const mode = btn.dataset.mode;
+                    appliedTheme = theme;
+                    appliedMode = mode;
                     applyTheme(theme, mode);
                 });
             });
+
             randomThemeBtn.addEventListener('click', () => {
                 const themes = ['orange', 'sakura', 'lavender', 'ocean', 'forest', 'midnight'];
                 const currentTheme = body.getAttribute('data-theme');
