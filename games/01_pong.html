@@ -962,6 +962,49 @@
                 <button class="mode-btn" data-mode="dark">🌙 深色</button>
             </div>
         </div>
+
+        <div class="theme-section">
+            <div class="theme-section-title">👫 玩家昵称</div>
+            <div class="nickname-section">
+                <div class="nickname-input-group">
+                    <span class="nickname-label">👤 玩家1</span>
+                    <input type="text" class="nickname-input" id="player1Name" placeholder="输入昵称" maxlength="10">
+                </div>
+                <div class="nickname-input-group">
+                    <span class="nickname-label">👤 玩家2</span>
+                    <input type="text" class="nickname-input" id="player2Name" placeholder="输入昵称" maxlength="10">
+                </div>
+                <button class="save-nickname-btn" id="saveNicknameBtn">
+                    💾 保存昵称
+                </button>
+            </div>
+        </div>
+
+        <div class="theme-section">
+            <button class="random-theme-btn" id="randomThemeBtn">
+                🎲 随机主题
+            </button>
+        </div>
+    </div>
+
+    <div class="pause-overlay" id="pauseOverlay">
+        <h2>⏸️ 游戏暂停</h2>
+        <div class="button-group">
+            <button id="resumeBtn">▶️ 继续游戏</button>
+            <button id="pauseRestartBtn" class="secondary">🔄 重新开始</button>
+            <button id="backToMenuBtn" class="secondary">🏠 返回主页</button>
+        </div>
+    </div>
+
+    <div class="share-modal" id="shareModal">
+        <h3>📸 分享战绩</h3>
+        <div class="share-preview">
+            <canvas id="shareCanvas" width="600" height="400"></canvas>
+        </div>
+        <div class="share-actions">
+            <button id="downloadBtn" class="download-btn">💾 下载图片</button>
+            <button id="closeShareBtn" class="secondary">❌ 关闭</button>
+        </div>
     </div>
 
     <button class="back-btn" onclick="location.href='../index.html'">← 返回</button>
@@ -1716,6 +1759,28 @@
             const themeBtn = document.getElementById('themeBtn');
             const themePanel = document.getElementById('themePanel');
             const randomThemeBtn = document.getElementById('randomThemeBtn');
+            const player1NameInput = document.getElementById('player1Name');
+            const player2NameInput = document.getElementById('player2Name');
+            const saveNicknameBtn = document.getElementById('saveNicknameBtn');
+            
+            const savedPlayer1Name = localStorage.getItem('couple-game-player1') || '玩家1';
+            const savedPlayer2Name = localStorage.getItem('couple-game-player2') || '玩家2';
+            
+            player1NameInput.value = savedPlayer1Name;
+            player2NameInput.value = savedPlayer2Name;
+            
+            saveNicknameBtn.addEventListener('click', () => {
+                const p1 = player1NameInput.value.trim() || '玩家1';
+                const p2 = player2NameInput.value.trim() || '玩家2';
+                
+                localStorage.setItem('couple-game-player1', p1);
+                localStorage.setItem('couple-game-player2', p2);
+                
+                saveNicknameBtn.textContent = '✅ 已保存';
+                setTimeout(() => {
+                    saveNicknameBtn.textContent = '💾 保存昵称';
+                }, 1500);
+            });
 
             const colorThemeBtns = document.querySelectorAll('.color-theme-btn');
             const modeBtns = document.querySelectorAll('.mode-btn');
@@ -1742,6 +1807,19 @@
 
             applyTheme(savedTheme, savedMode);
 
+            let appliedTheme = savedTheme;
+            let appliedMode = savedMode;
+
+            function previewTheme(theme, mode) {
+                body.setAttribute('data-theme', theme);
+                body.setAttribute('data-mode', mode);
+            }
+
+            function restoreTheme() {
+                body.setAttribute('data-theme', appliedTheme);
+                body.setAttribute('data-mode', appliedMode);
+            }
+
             themeBtn.addEventListener('click', () => {
                 themePanel.classList.toggle('active');
             });
@@ -1753,20 +1831,45 @@
             });
 
             colorThemeBtns.forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    const theme = btn.dataset.theme;
+                    const mode = body.getAttribute('data-mode');
+                    previewTheme(theme, mode);
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    restoreTheme();
+                });
+                
                 btn.addEventListener('click', () => {
                     const theme = btn.dataset.theme;
                     const mode = body.getAttribute('data-mode');
+                    appliedTheme = theme;
+                    appliedMode = mode;
                     applyTheme(theme, mode);
                 });
             });
 
             modeBtns.forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    const theme = body.getAttribute('data-theme');
+                    const mode = btn.dataset.mode;
+                    previewTheme(theme, mode);
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    restoreTheme();
+                });
+                
                 btn.addEventListener('click', () => {
                     const theme = body.getAttribute('data-theme');
                     const mode = btn.dataset.mode;
+                    appliedTheme = theme;
+                    appliedMode = mode;
                     applyTheme(theme, mode);
                 });
             });
+
             randomThemeBtn.addEventListener('click', () => {
                 const themes = ['orange', 'sakura', 'lavender', 'ocean', 'forest', 'midnight'];
                 const currentTheme = body.getAttribute('data-theme');
@@ -1780,30 +1883,12 @@
                     randomThemeBtn.style.transform = '';
                 }, 300);
                 
+                appliedTheme = randomTheme;
+                appliedMode = currentMode;
                 applyTheme(randomTheme, currentMode);
             });
 
         })();
     </script>
-
-    <div class="pause-overlay" id="pauseOverlay">
-        <h2>⏸️ 游戏暂停</h2>
-        <div class="button-group">
-            <button id="resumeBtn">▶️ 继续游戏</button>
-            <button id="pauseRestartBtn" class="secondary">🔄 重新开始</button>
-            <button id="backToMenuBtn" class="secondary">🏠 返回主页</button>
-        </div>
-    </div>
-
-    <div class="share-modal" id="shareModal">
-        <h3>📸 分享战绩</h3>
-        <div class="share-preview">
-            <canvas id="shareCanvas" width="600" height="400"></canvas>
-        </div>
-        <div class="share-actions">
-            <button id="downloadBtn" class="download-btn">💾 下载图片</button>
-            <button id="closeShareBtn" class="secondary">❌ 关闭</button>
-        </div>
-    </div>
 </body>
 </html>
