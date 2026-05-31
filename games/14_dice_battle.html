@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>骰子大作战 - 情侣小游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient-1: #fff5eb;
+            --bg-gradient-2: #ffe4c4;
+            --primary-color: #ff8c42;
+            --secondary-color: #ff6b35;
+            --accent-color: #ffd166;
+            --text-color: #333;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --border-color: #ff8c42;
+            --shadow: 0 8px 32px rgba(255, 140, 66, 0.3);
+            --player1-color: #ff6b6b;
+            --player2-color: #4ecdc4;
+        }
+
+        [data-theme="orange"] {
+            --bg-gradient-1: #fff5eb;
+            --bg-gradient-2: #ffe4c4;
+            --primary-color: #ff8c42;
+            --secondary-color: #ff6b35;
+            --accent-color: #ffd166;
+            --border-color: #ff8c42;
+            --shadow: 0 8px 32px rgba(255, 140, 66, 0.3);
+        }
+
+        [data-theme="pink"] {
+            --bg-gradient-1: #fff0f5;
+            --bg-gradient-2: #ffe4ec;
+            --primary-color: #ff6b9d;
+            --secondary-color: #c44569;
+            --accent-color: #ffb6c1;
+            --border-color: #ff6b9d;
+            --shadow: 0 8px 32px rgba(255, 107, 157, 0.3);
+        }
+
+        [data-theme="purple"] {
+            --bg-gradient-1: #f3e8ff;
+            --bg-gradient-2: #e6d5ff;
+            --primary-color: #9b59b6;
+            --secondary-color: #8e44ad;
+            --accent-color: #d4a5ff;
+            --border-color: #9b59b6;
+            --shadow: 0 8px 32px rgba(155, 89, 182, 0.3);
+        }
+
+        [data-theme="blue"] {
+            --bg-gradient-1: #e8f4fd;
+            --bg-gradient-2: #d4e8fc;
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #74b9ff;
+            --border-color: #3498db;
+            --shadow: 0 8px 32px rgba(52, 152, 219, 0.3);
+        }
+
+        [data-theme="green"] {
+            --bg-gradient-1: #e8f8f5;
+            --bg-gradient-2: #d1f2eb;
+            --primary-color: #1abc9c;
+            --secondary-color: #16a085;
+            --accent-color: #76d7c4;
+            --border-color: #1abc9c;
+            --shadow: 0 8px 32px rgba(26, 188, 156, 0.3);
+        }
+
+        [data-theme="red"] {
+            --bg-gradient-1: #fdedec;
+            --bg-gradient-2: #fadbd8;
+            --primary-color: #e74c3c;
+            --secondary-color: #c0392b;
+            --accent-color: #f1948a;
+            --border-color: #e74c3c;
+            --shadow: 0 8px 32px rgba(231, 76, 60, 0.3);
+        }
+
+        [data-mode="dark"] {
+            --bg-gradient-1: #1a1a2e;
+            --bg-gradient-2: #16213e;
+            --text-color: #fff;
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+            color: var(--text-color);
+            padding: 20px;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '💕';
+            position: fixed;
+            top: 10%;
+            left: 5%;
+            font-size: 60px;
+            opacity: 0.1;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '💖';
+            position: fixed;
+            bottom: 10%;
+            right: 5%;
+            font-size: 60px;
+            opacity: 0.1;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(255, 140, 66, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .theme-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+
+        .theme-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid white;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .theme-btn.active {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .theme-btn.orange { background: linear-gradient(135deg, #ff8c42, #ff6b35); }
+        .theme-btn.pink { background: linear-gradient(135deg, #ff6b9d, #c44569); }
+        .theme-btn.purple { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .theme-btn.blue { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .theme-btn.green { background: linear-gradient(135deg, #1abc9c, #16a085); }
+        .theme-btn.red { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
+        .mode-toggle {
+            width: 60px;
+            height: 30px;
+            background: #ddd;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .mode-toggle::after {
+            content: '☀️';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        [data-mode="dark"] .mode-toggle {
+            background: var(--primary-color);
+        }
+
+        [data-mode="dark"] .mode-toggle::after {
+            left: 32px;
+            content: '🌙';
+        }
+
+        .random-theme-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .random-theme-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .name-inputs {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .name-inputs input {
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .name-inputs input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.3);
+        }
+
+        .target-select {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .target-select label {
+            font-size: 1.1em;
+            margin-right: 10px;
+        }
+
+        .target-select select {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .game-area {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .player-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            min-width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .player-card.active {
+            border: 4px solid var(--primary-color);
+            transform: scale(1.05);
+            animation: glow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: var(--shadow); }
+            50% { box-shadow: 0 0 40px rgba(255, 140, 66, 0.6); }
+        }
+
+        .player-card h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .player1-card h2 {
+            color: var(--player1-color);
+        }
+
+        .player2-card h2 {
+            color: var(--player2-color);
+        }
+
+        .total-score {
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .total-label {
+            font-size: 0.9em;
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+
+        .current-round {
+            background: rgba(255, 140, 66, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .round-score {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .round-label {
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        .dice-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .dice {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.1s ease;
+        }
+
+        .dice.rolling {
+            animation: roll 0.5s ease-in-out;
+        }
+
+        @keyframes roll {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            25% { transform: rotateX(90deg) rotateY(90deg); }
+            50% { transform: rotateX(180deg) rotateY(180deg); }
+            75% { transform: rotateX(270deg) rotateY(270deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        .dice.double-one {
+            animation: shake 0.5s ease-in-out;
+            background: #ffe0e0;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .dice-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(255, 140, 66, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        }
+
+        .btn-hold {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+        .btn-share {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .game-message {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            min-height: 40px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .instructions {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .instructions h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .instructions p {
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+
+        .key-hint {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 0 3px;
+        }
+
+        .pause-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .pause-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .pause-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .pause-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .share-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .share-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .share-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        #shareCanvas {
+            border-radius: 10px;
+            margin-bottom: 20px;
+            max-width: 100%;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: transform 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        .history {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 0.9em;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .theme-panel {
+                position: static;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .game-area {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .player-card {
+                padding: 20px 30px;
+                min-width: 200px;
+            }
+
+            .dice {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body data-theme="orange" data-mode="light">
+    <div class="theme-panel">
+        <div>
+            <button class="theme-btn orange active" data-theme="orange" data-mode="light"></button>
+            <button class="theme-btn pink" data-theme="pink" data-mode="light"></button>
+            <button class="theme-btn purple" data-theme="purple" data-mode="light"></button>
+            <button class="theme-btn blue" data-theme="blue" data-mode="light"></button>
+            <button class="theme-btn green" data-theme="green" data-mode="light"></button>
+            <button class="theme-btn red" data-theme="red" data-mode="light"></button>
+        </div>
+        <div style="margin-top: 10px;">
+            <button class="theme-btn orange" data-theme="orange" data-mode="dark"></button>
+            <button class="theme-btn pink" data-theme="pink" data-mode="dark"></button>
+            <button class="theme-btn purple" data-theme="purple" data-mode="dark"></button>
+            <button class="theme-btn blue" data-theme="blue" data-mode="dark"></button>
+            <button class="theme-btn green" data-theme="green" data-mode="dark"></button>
+            <button class="theme-btn red" data-theme="red" data-mode="dark"></button>
+        </div>
+        <div class="mode-toggle" id="modeToggle"></div>
+        <button class="random-theme-btn" id="randomThemeBtn">🎲 随机主题</button>
+        <div class="name-inputs">
+            <input type="text" id="player1Name" placeholder="玩家1昵称" maxlength="10">
+            <input type="text" id="player2Name" placeholder="玩家2昵称" maxlength="10">
+        </div>
+    </div>
+
+    <div class="pause-overlay" id="pauseOverlay">
+        <div class="pause-content">
+            <h2>⏸️ 游戏暂停</h2>
+            <button class="btn btn-primary" onclick="togglePause()">▶️ 继续游戏</button>
+        </div>
+    </div>
+
+    <div class="share-modal" id="shareModal">
+        <span class="close-btn" onclick="closeShareModal()">&times;</span>
+        <div class="share-content">
+            <h2>📸 分享战绩</h2>
+            <canvas id="shareCanvas" width="400" height="350"></canvas>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="downloadShareImage()">💾 保存图片</button>
+                <button class="btn btn-secondary" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="../index.html" class="back-btn">← 返回主页</a>
+        <h1>🎲 骰子大作战</h1>
+        <p class="subtitle">策略与运气的较量！</p>
+
+        <div class="target-select">
+            <label for="targetScore">目标分数：</label>
+            <select id="targetScore">
+                <option value="50">快速局 (50分)</option>
+                <option value="100" selected>标准局 (100分)</option>
+                <option value="200">耐力局 (200分)</option>
+            </select>
+        </div>
+
+        <div class="game-message" id="gameMessage">点击"开始游戏"开始对战！</div>
+
+        <div class="game-area">
+            <div class="player-card player1-card" id="player1Card">
+                <h2 id="player1NameDisplay">玩家1</h2>
+                <div class="total-score" id="player1Total">0</div>
+                <div class="total-label">总分</div>
+                <div class="current-round">
+                    <div class="round-score" id="player1Round">0</div>
+                    <div class="round-label">本回合得分</div>
+                </div>
+            </div>
+
+            <div class="dice-container">
+                <div class="dice" id="dice1">🎲</div>
+                <div class="dice" id="dice2">🎲</div>
+            </div>
+
+            <div class="player-card player2-card" id="player2Card">
+                <h2 id="player2NameDisplay">玩家2</h2>
+                <div class="total-score" id="player2Total">0</div>
+                <div class="total-label">总分</div>
+                <div class="current-round">
+                    <div class="round-score" id="player2Round">0</div>
+                    <div class="round-label">本回合得分</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn" onclick="startGame()">🎮 开始游戏</button>
+                <button class="btn btn-primary" id="rollBtn" onclick="rollDice()" disabled>🎲 掷骰子</button>
+                <button class="btn btn-hold" id="holdBtn" onclick="holdScore()" disabled>✋ 停止</button>
+                <button class="btn btn-secondary" id="pauseBtn" onclick="togglePause()">⏸️ 暂停</button>
+                <button class="btn btn-share" id="shareBtn" onclick="showShareModal()">📸 分享战绩</button>
+            </div>
+        </div>
+
+        <div class="history" id="history">
+            <h3>📜 对战记录</h3>
+            <div id="historyContent">
+                <p style="text-align: center; opacity: 0.5;">暂无记录</p>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>🎯 游戏规则</h3>
+            <p>每回合可以多次掷骰子，点数累加到本回合得分</p>
+            <p>如果掷出<span style="color: #e74c3c; font-weight: bold;">1</span>，本回合得分清零，轮到对方</p>
+            <p>如果掷出<span style="color: #e74c3c; font-weight: bold;">两个1</span>，总分清零，轮到对方</p>
+            <p>选择"停止"将本回合得分加到总分，轮到对方</p>
+            <p>先达到目标分数的玩家获胜！</p>
+            <p style="margin-top: 10px;">
+                <strong>玩家1：</strong><span class="key-hint">空格</span> 掷骰子，<span class="key-hint">Q</span> 停止
+                <strong style="margin-left: 20px;">玩家2：</strong><span class="key-hint">回车</span> 掷骰子，<span class="key-hint">P</span> 停止
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let player1Name = urlParams.get('p1') || '玩家1';
+        let player2Name = urlParams.get('p2') || '玩家2';
+
+        document.getElementById('player1Name').value = player1Name;
+        document.getElementById('player2Name').value = player2Name;
+        document.getElementById('player1NameDisplay').textContent = player1Name;
+        document.getElementById('player2NameDisplay').textContent = player2Name;
+
+        let targetScore = 100;
+        let scores = [0, 0];
+        let roundScore = 0;
+        let currentPlayer = 0;
+        let gameRunning = false;
+        let gamePaused = false;
+        let isRolling = false;
+        let winner = null;
+        let history = [];
+
+        const body = document.body;
+        const colorThemeBtns = document.querySelectorAll('.theme-btn');
+        const modeToggle = document.getElementById('modeToggle');
+        const randomThemeBtn = document.getElementById('randomThemeBtn');
+
+        let appliedTheme = localStorage.getItem('theme') || 'orange';
+        let appliedMode = localStorage.getItem('mode') || 'light';
+
+        function applyTheme(theme, mode) {
+            body.setAttribute('data-theme', theme);
+            body.setAttribute('data-mode', mode);
+            localStorage.setItem('theme', theme);
+            localStorage.setItem('mode', mode);
+            
+            colorThemeBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.theme === theme && btn.dataset.mode === mode) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function previewTheme(theme, mode) {
+            body.setAttribute('data-theme', theme);
+            body.setAttribute('data-mode', mode);
+        }
+
+        function restoreTheme() {
+            body.setAttribute('data-theme', appliedTheme);
+            body.setAttribute('data-mode', appliedMode);
+        }
+
+        applyTheme(appliedTheme, appliedMode);
+
+        colorThemeBtns.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                const theme = btn.dataset.theme;
+                const mode = btn.dataset.mode;
+                previewTheme(theme, mode);
+            });
+            btn.addEventListener('mouseleave', () => {
+                restoreTheme();
+            });
+            btn.addEventListener('click', () => {
+                const theme = btn.dataset.theme;
+                const mode = btn.dataset.mode;
+                appliedTheme = theme;
+                appliedMode = mode;
+                applyTheme(theme, mode);
+            });
+        });
+
+        modeToggle.addEventListener('click', () => {
+            appliedMode = appliedMode === 'light' ? 'dark' : 'light';
+            applyTheme(appliedTheme, appliedMode);
+        });
+
+        randomThemeBtn.addEventListener('click', () => {
+            const themes = ['orange', 'pink', 'purple', 'blue', 'green', 'red'];
+            const modes = ['light', 'dark'];
+            const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+            const randomMode = modes[Math.floor(Math.random() * modes.length)];
+            appliedTheme = randomTheme;
+            appliedMode = randomMode;
+            applyTheme(randomTheme, randomMode);
+        });
+
+        document.getElementById('player1Name').addEventListener('input', updateNames);
+        document.getElementById('player2Name').addEventListener('input', updateNames);
+
+        function updateNames() {
+            player1Name = document.getElementById('player1Name').value || '玩家1';
+            player2Name = document.getElementById('player2Name').value || '玩家2';
+            document.getElementById('player1NameDisplay').textContent = player1Name;
+            document.getElementById('player2NameDisplay').textContent = player2Name;
+        }
+
+        document.getElementById('targetScore').addEventListener('change', function() {
+            targetScore = parseInt(this.value);
+        });
+
+        function startGame() {
+            scores = [0, 0];
+            roundScore = 0;
+            currentPlayer = Math.floor(Math.random() * 2);
+            gameRunning = true;
+            gamePaused = false;
+            winner = null;
+            history = [];
+
+            updateScoreDisplay();
+            updatePlayerHighlight();
+            updateMessage(`${currentPlayer === 0 ? player1Name : player2Name} 先开始！`);
+
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('rollBtn').disabled = false;
+            document.getElementById('holdBtn').disabled = false;
+            document.getElementById('pauseBtn').textContent = '⏸️ 暂停';
+
+            document.getElementById('historyContent').innerHTML = '<p style="text-align: center; opacity: 0.5;">暂无记录</p>';
+        }
+
+        function rollDice() {
+            if (!gameRunning || gamePaused || isRolling) return;
+            if ((currentPlayer === 0 && event && event.code === 'Enter') || 
+                (currentPlayer === 1 && event && event.code === 'Space')) return;
+
+            isRolling = true;
+            document.getElementById('rollBtn').disabled = true;
+            document.getElementById('holdBtn').disabled = true;
+
+            const dice1 = document.getElementById('dice1');
+            const dice2 = document.getElementById('dice2');
+
+            dice1.classList.add('rolling');
+            dice2.classList.add('rolling');
+
+            let rollCount = 0;
+            const rollInterval = setInterval(() => {
+                dice1.textContent = getDiceEmoji(Math.floor(Math.random() * 6) + 1);
+                dice2.textContent = getDiceEmoji(Math.floor(Math.random() * 6) + 1);
+                rollCount++;
+
+                if (rollCount >= 10) {
+                    clearInterval(rollInterval);
+
+                    const val1 = Math.floor(Math.random() * 6) + 1;
+                    const val2 = Math.floor(Math.random() * 6) + 1;
+
+                    dice1.textContent = getDiceEmoji(val1);
+                    dice2.textContent = getDiceEmoji(val2);
+                    dice1.classList.remove('rolling');
+                    dice2.classList.remove('rolling');
+
+                    handleDiceResult(val1, val2);
+                }
+            }, 50);
+        }
+
+        function getDiceEmoji(value) {
+            const emojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+            return emojis[value - 1];
+        }
+
+        function handleDiceResult(val1, val2) {
+            const dice1 = document.getElementById('dice1');
+            const dice2 = document.getElementById('dice2');
+            const currentName = currentPlayer === 0 ? player1Name : player2Name;
+
+            if (val1 === 1 && val2 === 1) {
+                dice1.classList.add('double-one');
+                dice2.classList.add('double-one');
+                setTimeout(() => {
+                    dice1.classList.remove('double-one');
+                    dice2.classList.remove('double-one');
+                }, 500);
+
+                scores[currentPlayer] = 0;
+                roundScore = 0;
+                addHistory(`${currentName} 掷出 🎲🎲 两个1！总分清零！`);
+                updateMessage(`${currentName} 掷出两个1！总分清零，轮到对方！`);
+                switchPlayer();
+            } else if (val1 === 1 || val2 === 1) {
+                roundScore = 0;
+                addHistory(`${currentName} 掷出 ${val1} + ${val2}，本回合清零！`);
+                updateMessage(`${currentName} 掷出1！本回合得分清零，轮到对方！`);
+                switchPlayer();
+            } else {
+                roundScore += val1 + val2;
+                addHistory(`${currentName} 掷出 ${val1} + ${val2} = ${val1 + val2}，本回合 ${roundScore} 分`);
+                updateMessage(`${currentName} 掷出 ${val1} + ${val2}！本回合得分：${roundScore}`);
+
+                if (scores[currentPlayer] + roundScore >= targetScore) {
+                    scores[currentPlayer] += roundScore;
+                    winner = currentPlayer;
+                    gameRunning = false;
+                    addHistory(`🏆 ${currentName} 获胜！`);
+                    updateMessage(`🎉 ${currentName} 获胜！最终得分：${scores[currentPlayer]}`);
+                    updateScoreDisplay();
+                    
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('rollBtn').disabled = true;
+                    document.getElementById('holdBtn').disabled = true;
+                    document.getElementById('player1Card').classList.remove('active');
+                    document.getElementById('player2Card').classList.remove('active');
+                    isRolling = false;
+                    return;
+                }
+            }
+
+            updateScoreDisplay();
+            isRolling = false;
+            
+            if (gameRunning) {
+                document.getElementById('rollBtn').disabled = false;
+                document.getElementById('holdBtn').disabled = false;
+            }
+        }
+
+        function holdScore() {
+            if (!gameRunning || gamePaused || isRolling) return;
+            if ((currentPlayer === 0 && event && event.code === 'KeyP') || 
+                (currentPlayer === 1 && event && event.code === 'KeyQ')) return;
+
+            const currentName = currentPlayer === 0 ? player1Name : player2Name;
+            scores[currentPlayer] += roundScore;
+            addHistory(`${currentName} 选择停止，获得 ${roundScore} 分`);
+            updateMessage(`${currentName} 获得 ${roundScore} 分！轮到对方！`);
+            roundScore = 0;
+            updateScoreDisplay();
+            switchPlayer();
+        }
+
+        function switchPlayer() {
+            currentPlayer = currentPlayer === 0 ? 1 : 0;
+            roundScore = 0;
+            updatePlayerHighlight();
+            updateScoreDisplay();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('player1Total').textContent = scores[0];
+            document.getElementById('player2Total').textContent = scores[1];
+            document.getElementById('player1Round').textContent = currentPlayer === 0 ? roundScore : 0;
+            document.getElementById('player2Round').textContent = currentPlayer === 1 ? roundScore : 0;
+        }
+
+        function updatePlayerHighlight() {
+            document.getElementById('player1Card').classList.toggle('active', currentPlayer === 0 && gameRunning);
+            document.getElementById('player2Card').classList.toggle('active', currentPlayer === 1 && gameRunning);
+        }
+
+        function updateMessage(msg) {
+            document.getElementById('gameMessage').textContent = msg;
+        }
+
+        function addHistory(msg) {
+            history.unshift(msg);
+            if (history.length > 20) history.pop();
+            
+            const historyContent = document.getElementById('historyContent');
+            historyContent.innerHTML = history.map((item, index) => 
+                `<div class="history-item">${index + 1}. ${item}</div>`
+            ).join('');
+        }
+
+        function togglePause() {
+            if (!gameRunning && !gamePaused) return;
+            
+            gamePaused = !gamePaused;
+            const pauseOverlay = document.getElementById('pauseOverlay');
+            const pauseBtn = document.getElementById('pauseBtn');
+            
+            if (gamePaused) {
+                pauseOverlay.classList.add('active');
+                pauseBtn.textContent = '▶️ 继续';
+                document.getElementById('rollBtn').disabled = true;
+                document.getElementById('holdBtn').disabled = true;
+            } else {
+                pauseOverlay.classList.remove('active');
+                pauseBtn.textContent = '⏸️ 暂停';
+                if (gameRunning && !isRolling) {
+                    document.getElementById('rollBtn').disabled = false;
+                    document.getElementById('holdBtn').disabled = false;
+                }
+            }
+        }
+
+        function showShareModal() {
+            const shareModal = document.getElementById('shareModal');
+            shareModal.classList.add('active');
+            generateShareImage();
+        }
+
+        function closeShareModal() {
+            const shareModal = document.getElementById('shareModal');
+            shareModal.classList.remove('active');
+        }
+
+        function generateShareImage() {
+            const canvas = document.getElementById('shareCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#fff5eb');
+            gradient.addColorStop(1, '#ffe4c4');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#ff8c42';
+            ctx.font = 'bold 28px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🎲 骰子大作战', canvas.width / 2, 50);
+            
+            ctx.fillStyle = '#333';
+            ctx.font = '18px Arial';
+            ctx.fillText(`${player1Name} vs ${player2Name}`, canvas.width / 2, 90);
+            
+            ctx.fillStyle = '#ff6b6b';
+            ctx.font = 'bold 22px Arial';
+            ctx.fillText(`${player1Name}: ${scores[0]} 分`, canvas.width / 2, 140);
+            
+            ctx.fillStyle = '#4ecdc4';
+            ctx.fillText(`${player2Name}: ${scores[1]} 分`, canvas.width / 2, 180);
+            
+            ctx.fillStyle = '#666';
+            ctx.font = '16px Arial';
+            ctx.fillText(`目标分数: ${targetScore}`, canvas.width / 2, 220);
+            
+            let resultText = '';
+            if (winner === 0) {
+                resultText = `🏆 ${player1Name} 获胜！`;
+            } else if (winner === 1) {
+                resultText = `🏆 ${player2Name} 获胜！`;
+            } else if (gameRunning) {
+                resultText = '游戏进行中...';
+            } else {
+                resultText = '等待开始...';
+            }
+            
+            ctx.fillStyle = '#ff8c42';
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText(resultText, canvas.width / 2, 280);
+            
+            ctx.fillStyle = '#999';
+            ctx.font = '14px Arial';
+            ctx.fillText('情侣小游戏合集', canvas.width / 2, 330);
+        }
+
+        function downloadShareImage() {
+            const canvas = document.getElementById('shareCanvas');
+            const link = document.createElement('a');
+            link.download = '骰子大作战战绩.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (gamePaused && e.code !== 'Escape') return;
+            
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (currentPlayer === 0 && gameRunning && !isRolling) {
+                    rollDice();
+                }
+            } else if (e.code === 'Enter') {
+                e.preventDefault();
+                if (currentPlayer === 1 && gameRunning && !isRolling) {
+                    rollDice();
+                }
+            } else if (e.code === 'KeyQ') {
+                e.preventDefault();
+                if (currentPlayer === 0 && gameRunning && !isRolling) {
+                    holdScore();
+                }
+            } else if (e.code === 'KeyP') {
+                e.preventDefault();
+                if (currentPlayer === 1 && gameRunning && !isRolling) {
+                    holdScore();
+                }
+            } else if (e.code === 'Escape') {
+                if (gameRunning || gamePaused) {
+                    togglePause();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

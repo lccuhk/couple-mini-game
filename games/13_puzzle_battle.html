@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼图对战 - 情侣小游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient-1: #fff5eb;
+            --bg-gradient-2: #ffe4c4;
+            --primary-color: #ff8c42;
+            --secondary-color: #ff6b35;
+            --accent-color: #ffd166;
+            --text-color: #333;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --border-color: #ff8c42;
+            --shadow: 0 8px 32px rgba(255, 140, 66, 0.3);
+            --player1-color: #ff6b6b;
+            --player2-color: #4ecdc4;
+        }
+
+        [data-theme="orange"] {
+            --bg-gradient-1: #fff5eb;
+            --bg-gradient-2: #ffe4c4;
+            --primary-color: #ff8c42;
+            --secondary-color: #ff6b35;
+            --accent-color: #ffd166;
+            --border-color: #ff8c42;
+            --shadow: 0 8px 32px rgba(255, 140, 66, 0.3);
+        }
+
+        [data-theme="pink"] {
+            --bg-gradient-1: #fff0f5;
+            --bg-gradient-2: #ffe4ec;
+            --primary-color: #ff6b9d;
+            --secondary-color: #c44569;
+            --accent-color: #ffb6c1;
+            --border-color: #ff6b9d;
+            --shadow: 0 8px 32px rgba(255, 107, 157, 0.3);
+        }
+
+        [data-theme="purple"] {
+            --bg-gradient-1: #f3e8ff;
+            --bg-gradient-2: #e6d5ff;
+            --primary-color: #9b59b6;
+            --secondary-color: #8e44ad;
+            --accent-color: #d4a5ff;
+            --border-color: #9b59b6;
+            --shadow: 0 8px 32px rgba(155, 89, 182, 0.3);
+        }
+
+        [data-theme="blue"] {
+            --bg-gradient-1: #e8f4fd;
+            --bg-gradient-2: #d4e8fc;
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #74b9ff;
+            --border-color: #3498db;
+            --shadow: 0 8px 32px rgba(52, 152, 219, 0.3);
+        }
+
+        [data-theme="green"] {
+            --bg-gradient-1: #e8f8f5;
+            --bg-gradient-2: #d1f2eb;
+            --primary-color: #1abc9c;
+            --secondary-color: #16a085;
+            --accent-color: #76d7c4;
+            --border-color: #1abc9c;
+            --shadow: 0 8px 32px rgba(26, 188, 156, 0.3);
+        }
+
+        [data-theme="red"] {
+            --bg-gradient-1: #fdedec;
+            --bg-gradient-2: #fadbd8;
+            --primary-color: #e74c3c;
+            --secondary-color: #c0392b;
+            --accent-color: #f1948a;
+            --border-color: #e74c3c;
+            --shadow: 0 8px 32px rgba(231, 76, 60, 0.3);
+        }
+
+        [data-mode="dark"] {
+            --bg-gradient-1: #1a1a2e;
+            --bg-gradient-2: #16213e;
+            --text-color: #fff;
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+            color: var(--text-color);
+            padding: 20px;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '💕';
+            position: fixed;
+            top: 10%;
+            left: 5%;
+            font-size: 60px;
+            opacity: 0.1;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '💖';
+            position: fixed;
+            bottom: 10%;
+            right: 5%;
+            font-size: 60px;
+            opacity: 0.1;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(255, 140, 66, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .theme-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+
+        .theme-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid white;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .theme-btn.active {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .theme-btn.orange { background: linear-gradient(135deg, #ff8c42, #ff6b35); }
+        .theme-btn.pink { background: linear-gradient(135deg, #ff6b9d, #c44569); }
+        .theme-btn.purple { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .theme-btn.blue { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .theme-btn.green { background: linear-gradient(135deg, #1abc9c, #16a085); }
+        .theme-btn.red { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
+        .mode-toggle {
+            width: 60px;
+            height: 30px;
+            background: #ddd;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .mode-toggle::after {
+            content: '☀️';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        [data-mode="dark"] .mode-toggle {
+            background: var(--primary-color);
+        }
+
+        [data-mode="dark"] .mode-toggle::after {
+            left: 32px;
+            content: '🌙';
+        }
+
+        .random-theme-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .random-theme-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .name-inputs {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .name-inputs input {
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .name-inputs input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.3);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .player-info {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .player-info h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .player1 h2 {
+            color: var(--player1-color);
+        }
+
+        .player2 h2 {
+            color: var(--player2-color);
+        }
+
+        .player-info .time {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .player-info .status {
+            font-size: 1em;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        .player-info.active {
+            border: 3px solid var(--primary-color);
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: var(--shadow); }
+            50% { box-shadow: 0 0 30px rgba(255, 140, 66, 0.6); }
+        }
+
+        .game-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .puzzle-board {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 80px);
+            grid-template-rows: repeat(4, 80px);
+            gap: 4px;
+            background: var(--border-color);
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .puzzle-cell {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .puzzle-cell:hover:not(.empty):not(.selected) {
+            transform: scale(0.95);
+        }
+
+        .puzzle-cell.selected {
+            transform: scale(0.9);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+
+        .puzzle-cell.empty {
+            background: rgba(0, 0, 0, 0.1);
+            cursor: default;
+        }
+
+        .player1-board .puzzle-cell:not(.empty) {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            color: white;
+        }
+
+        .player2-board .puzzle-cell:not(.empty) {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .player1-board .puzzle-cell.correct {
+            background: linear-gradient(135deg, #51cf66, #40c057) !important;
+        }
+
+        .player2-board .puzzle-cell.correct {
+            background: linear-gradient(135deg, #51cf66, #40c057) !important;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(255, 140, 66, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        }
+
+        .btn-share {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .difficulty-select {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .difficulty-select label {
+            font-size: 1.1em;
+            margin-right: 10px;
+        }
+
+        .difficulty-select select {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .instructions {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .instructions h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .instructions p {
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+
+        .key-hint {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 0 3px;
+        }
+
+        .pause-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .pause-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .pause-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .pause-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .share-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .share-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .share-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        #shareCanvas {
+            border-radius: 10px;
+            margin-bottom: 20px;
+            max-width: 100%;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: transform 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        @media (max-width: 768px) {
+            .theme-panel {
+                position: static;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .puzzle-grid {
+                grid-template-columns: repeat(4, 60px);
+                grid-template-rows: repeat(4, 60px);
+            }
+
+            .puzzle-cell {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5em;
+            }
+
+            .game-info {
+                gap: 20px;
+            }
+
+            .player-info {
+                padding: 15px 25px;
+                min-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body data-theme="orange" data-mode="light">
+    <div class="theme-panel">
+        <div>
+            <button class="theme-btn orange active" data-theme="orange" data-mode="light"></button>
+            <button class="theme-btn pink" data-theme="pink" data-mode="light"></button>
+            <button class="theme-btn purple" data-theme="purple" data-mode="light"></button>
+            <button class="theme-btn blue" data-theme="blue" data-mode="light"></button>
+            <button class="theme-btn green" data-theme="green" data-mode="light"></button>
+            <button class="theme-btn red" data-theme="red" data-mode="light"></button>
+        </div>
+        <div style="margin-top: 10px;">
+            <button class="theme-btn orange" data-theme="orange" data-mode="dark"></button>
+            <button class="theme-btn pink" data-theme="pink" data-mode="dark"></button>
+            <button class="theme-btn purple" data-theme="purple" data-mode="dark"></button>
+            <button class="theme-btn blue" data-theme="blue" data-mode="dark"></button>
+            <button class="theme-btn green" data-theme="green" data-mode="dark"></button>
+            <button class="theme-btn red" data-theme="red" data-mode="dark"></button>
+        </div>
+        <div class="mode-toggle" id="modeToggle"></div>
+        <button class="random-theme-btn" id="randomThemeBtn">🎲 随机主题</button>
+        <div class="name-inputs">
+            <input type="text" id="player1Name" placeholder="玩家1昵称" maxlength="10">
+            <input type="text" id="player2Name" placeholder="玩家2昵称" maxlength="10">
+        </div>
+    </div>
+
+    <div class="pause-overlay" id="pauseOverlay">
+        <div class="pause-content">
+            <h2>⏸️ 游戏暂停</h2>
+            <button class="btn btn-primary" onclick="togglePause()">▶️ 继续游戏</button>
+        </div>
+    </div>
+
+    <div class="share-modal" id="shareModal">
+        <span class="close-btn" onclick="closeShareModal()">&times;</span>
+        <div class="share-content">
+            <h2>📸 分享战绩</h2>
+            <canvas id="shareCanvas" width="400" height="300"></canvas>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="downloadShareImage()">💾 保存图片</button>
+                <button class="btn btn-secondary" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="../index.html" class="back-btn">← 返回主页</a>
+        <h1>🧩 拼图对战</h1>
+        <p class="subtitle">双人竞速拼图大比拼！</p>
+
+        <div class="difficulty-select">
+            <label for="difficulty">难度选择：</label>
+            <select id="difficulty">
+                <option value="3">简单 (3×3)</option>
+                <option value="4" selected>中等 (4×4)</option>
+                <option value="5">困难 (5×5)</option>
+            </select>
+        </div>
+
+        <div class="game-info">
+            <div class="player-info player1" id="player1Info">
+                <h2 id="player1NameDisplay">玩家1</h2>
+                <div class="time" id="player1Time">00:00</div>
+                <div class="status" id="player1Status">准备中</div>
+            </div>
+            <div class="player-info player2" id="player2Info">
+                <h2 id="player2NameDisplay">玩家2</h2>
+                <div class="time" id="player2Time">00:00</div>
+                <div class="status" id="player2Status">准备中</div>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <div class="puzzle-board player1-board">
+                <div class="puzzle-grid" id="player1Grid"></div>
+            </div>
+            <div class="puzzle-board player2-board">
+                <div class="puzzle-grid" id="player2Grid"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn" onclick="startGame()">🎮 开始游戏</button>
+                <button class="btn btn-secondary" id="pauseBtn" onclick="togglePause()">⏸️ 暂停</button>
+                <button class="btn btn-share" id="shareBtn" onclick="showShareModal()">📸 分享战绩</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>🎯 游戏说明</h3>
+            <p><strong>玩家1：</strong><span class="key-hint">W</span><span class="key-hint">A</span><span class="key-hint">S</span><span class="key-hint">D</span> 移动选择，<span class="key-hint">空格</span> 交换方块</p>
+            <p><strong>玩家2：</strong><span class="key-hint">↑</span><span class="key-hint">←</span><span class="key-hint">↓</span><span class="key-hint">→</span> 移动选择，<span class="key-hint">回车</span> 交换方块</p>
+            <p>将数字按顺序排列，先完成拼图的玩家获胜！</p>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let player1Name = urlParams.get('p1') || '玩家1';
+        let player2Name = urlParams.get('p2') || '玩家2';
+
+        document.getElementById('player1Name').value = player1Name;
+        document.getElementById('player2Name').value = player2Name;
+        document.getElementById('player1NameDisplay').textContent = player1Name;
+        document.getElementById('player2NameDisplay').textContent = player2Name;
+
+        let gridSize = 4;
+        let board1 = [];
+        let board2 = [];
+        let selected1 = { row: 0, col: 0 };
+        let selected2 = { row: 0, col: 0 };
+        let gameRunning = false;
+        let gamePaused = false;
+        let timer1 = 0;
+        let timer2 = 0;
+        let timerInterval1 = null;
+        let timerInterval2 = null;
+        let finished1 = false;
+        let finished2 = false;
+        let winner = null;
+
+        const body = document.body;
+        const colorThemeBtns = document.querySelectorAll('.theme-btn');
+        const modeToggle = document.getElementById('modeToggle');
+        const randomThemeBtn = document.getElementById('randomThemeBtn');
+
+        let appliedTheme = localStorage.getItem('theme') || 'orange';
+        let appliedMode = localStorage.getItem('mode') || 'light';
+
+        function applyTheme(theme, mode) {
+            body.setAttribute('data-theme', theme);
+            body.setAttribute('data-mode', mode);
+            localStorage.setItem('theme', theme);
+            localStorage.setItem('mode', mode);
+            
+            colorThemeBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.theme === theme && btn.dataset.mode === mode) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function previewTheme(theme, mode) {
+            body.setAttribute('data-theme', theme);
+            body.setAttribute('data-mode', mode);
+        }
+
+        function restoreTheme() {
+            body.setAttribute('data-theme', appliedTheme);
+            body.setAttribute('data-mode', appliedMode);
+        }
+
+        applyTheme(appliedTheme, appliedMode);
+
+        colorThemeBtns.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                const theme = btn.dataset.theme;
+                const mode = btn.dataset.mode;
+                previewTheme(theme, mode);
+            });
+            btn.addEventListener('mouseleave', () => {
+                restoreTheme();
+            });
+            btn.addEventListener('click', () => {
+                const theme = btn.dataset.theme;
+                const mode = btn.dataset.mode;
+                appliedTheme = theme;
+                appliedMode = mode;
+                applyTheme(theme, mode);
+            });
+        });
+
+        modeToggle.addEventListener('click', () => {
+            appliedMode = appliedMode === 'light' ? 'dark' : 'light';
+            applyTheme(appliedTheme, appliedMode);
+        });
+
+        randomThemeBtn.addEventListener('click', () => {
+            const themes = ['orange', 'pink', 'purple', 'blue', 'green', 'red'];
+            const modes = ['light', 'dark'];
+            const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+            const randomMode = modes[Math.floor(Math.random() * modes.length)];
+            appliedTheme = randomTheme;
+            appliedMode = randomMode;
+            applyTheme(randomTheme, randomMode);
+        });
+
+        document.getElementById('player1Name').addEventListener('input', updateNames);
+        document.getElementById('player2Name').addEventListener('input', updateNames);
+
+        function updateNames() {
+            player1Name = document.getElementById('player1Name').value || '玩家1';
+            player2Name = document.getElementById('player2Name').value || '玩家2';
+            document.getElementById('player1NameDisplay').textContent = player1Name;
+            document.getElementById('player2NameDisplay').textContent = player2Name;
+        }
+
+        document.getElementById('difficulty').addEventListener('change', function() {
+            gridSize = parseInt(this.value);
+            if (!gameRunning) {
+                initBoards();
+            }
+        });
+
+        function initBoards() {
+            board1 = createSolvablePuzzle();
+            board2 = JSON.parse(JSON.stringify(board1));
+            selected1 = { row: 0, col: 0 };
+            selected2 = { row: 0, col: 0 };
+            renderBoard('player1Grid', board1, selected1, 1);
+            renderBoard('player2Grid', board2, selected2, 2);
+        }
+
+        function createSolvablePuzzle() {
+            const size = gridSize * gridSize;
+            let tiles = [];
+            for (let i = 0; i < size; i++) {
+                tiles.push(i);
+            }
+            
+            do {
+                shuffleArray(tiles);
+            } while (!isSolvable(tiles));
+            
+            const board = [];
+            for (let i = 0; i < gridSize; i++) {
+                board.push(tiles.slice(i * gridSize, (i + 1) * gridSize));
+            }
+            return board;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function isSolvable(tiles) {
+            let inversions = 0;
+            const size = tiles.length;
+            
+            for (let i = 0; i < size - 1; i++) {
+                for (let j = i + 1; j < size; j++) {
+                    if (tiles[i] !== 0 && tiles[j] !== 0 && tiles[i] > tiles[j]) {
+                        inversions++;
+                    }
+                }
+            }
+            
+            if (gridSize % 2 === 1) {
+                return inversions % 2 === 0;
+            } else {
+                const emptyRow = Math.floor(tiles.indexOf(0) / gridSize);
+                const emptyRowFromBottom = gridSize - emptyRow;
+                if (emptyRowFromBottom % 2 === 1) {
+                    return inversions % 2 === 0;
+                } else {
+                    return inversions % 2 === 1;
+                }
+            }
+        }
+
+        function renderBoard(gridId, board, selected, player) {
+            const grid = document.getElementById(gridId);
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = `repeat(${gridSize}, ${80px)`;
+            grid.style.gridTemplateRows = `repeat(${gridSize}, ${80px})`;
+            
+            const solved = getSolvedBoard();
+            
+            for (let row = 0; row < gridSize; row++) {
+                for (let col = 0; col < gridSize; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'puzzle-cell';
+                    
+                    if (board[row][col] === 0) {
+                        cell.classList.add('empty');
+                    } else {
+                        cell.textContent = board[row][col];
+                        if (board[row][col] === solved[row][col]) {
+                            cell.classList.add('correct');
+                        }
+                    }
+                    
+                    if (row === selected.row && col === selected.col) {
+                        cell.classList.add('selected');
+                    }
+                    
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        function getSolvedBoard() {
+            const solved = [];
+            let num = 1;
+            for (let i = 0; i < gridSize; i++) {
+                const row = [];
+                for (let j = 0; j < gridSize; j++) {
+                    if (i === gridSize - 1 && j === gridSize - 1) {
+                        row.push(0);
+                    } else {
+                        row.push(num++);
+                    }
+                }
+                solved.push(row);
+            }
+            return solved;
+        }
+
+        function isSolved(board) {
+            const solved = getSolvedBoard();
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (board[i][j] !== solved[i][j]) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function moveSelection(player, direction) {
+            if (!gameRunning || gamePaused) return;
+            
+            const selected = player === 1 ? selected1 : selected2;
+            const newRow = selected.row;
+            const newCol = selected.col;
+            
+            switch (direction) {
+                case 'up':
+                    newRow = Math.max(0, selected.row - 1);
+                    break;
+                case 'down':
+                    newRow = Math.min(gridSize - 1, selected.row + 1);
+                    break;
+                case 'left':
+                    newCol = Math.max(0, selected.col - 1);
+                    break;
+                case 'right':
+                    newCol = Math.min(gridSize - 1, selected.col + 1);
+                    break;
+            }
+            
+            if (player === 1) {
+                selected1 = { row: newRow, col: newCol };
+                renderBoard('player1Grid', board1, selected1, 1);
+            } else {
+                selected2 = { row: newRow, col: newCol };
+                renderBoard('player2Grid', board2, selected2, 2);
+            }
+        }
+
+        function swapTiles(player) {
+            if (!gameRunning || gamePaused) return;
+            
+            const board = player === 1 ? board1 : board2;
+            const selected = player === 1 ? selected1 : selected2;
+            
+            const emptyPos = findEmptyPosition(board);
+            
+            if (isAdjacent(selected, emptyPos)) {
+                [board[selected.row][selected.col], board[emptyPos.row][emptyPos.col]] = 
+                [board[emptyPos.row][emptyPos.col], board[selected.row][selected.col]];
+                
+                if (player === 1) {
+                    selected1 = { row: emptyPos.row, col: emptyPos.col };
+                    renderBoard('player1Grid', board1, selected1, 1);
+                    if (isSolved(board1) && !finished1) {
+                        finished1 = true;
+                        stopTimer(1);
+                        checkWinner();
+                    }
+                } else {
+                    selected2 = { row: emptyPos.row, col: emptyPos.col };
+                    renderBoard('player2Grid', board2, selected2, 2);
+                    if (isSolved(board2) && !finished2) {
+                        finished2 = true;
+                        stopTimer(2);
+                        checkWinner();
+                    }
+                }
+            }
+        }
+
+        function findEmptyPosition(board) {
+            for (let row = 0; row < gridSize; row++) {
+                for (let col = 0; col < gridSize; col++) {
+                    if (board[row][col] === 0) {
+                        return { row, col };
+                    }
+                }
+            }
+            return null;
+        }
+
+        function isAdjacent(pos1, pos2) {
+            const rowDiff = Math.abs(pos1.row - pos2.row);
+            const colDiff = Math.abs(pos1.col - pos2.col);
+            return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+        }
+
+        function startGame() {
+            if (gameRunning) return;
+            
+            initBoards();
+            gameRunning = true;
+            gamePaused = false;
+            finished1 = false;
+            finished2 = false;
+            winner = null;
+            timer1 = 0;
+            timer2 = 0;
+            
+            document.getElementById('player1Status').textContent = '进行中';
+            document.getElementById('player2Status').textContent = '进行中';
+            document.getElementById('player1Info').classList.add('active');
+            document.getElementById('player2Info').classList.add('active');
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('pauseBtn').textContent = '⏸️ 暂停';
+            
+            startTimers();
+        }
+
+        function startTimers() {
+            timerInterval1 = setInterval(() => {
+                if (!gamePaused && !finished1) {
+                    timer1++;
+                    updateTimerDisplay(1);
+                }
+            }, 1000);
+            
+            timerInterval2 = setInterval(() => {
+                if (!gamePaused && !finished2) {
+                    timer2++;
+                    updateTimerDisplay(2);
+                }
+            }, 1000);
+        }
+
+        function stopTimer(player) {
+            if (player === 1) {
+                clearInterval(timerInterval1);
+                document.getElementById('player1Status').textContent = '✓ 完成！';
+                document.getElementById('player1Info').classList.remove('active');
+            } else {
+                clearInterval(timerInterval2);
+                document.getElementById('player2Status').textContent = '✓ 完成！';
+                document.getElementById('player2Info').classList.remove('active');
+            }
+        }
+
+        function updateTimerDisplay(player) {
+            const timer = player === 1 ? timer1 : timer2;
+            const minutes = Math.floor(timer / 60).toString().padStart(2, '0');
+            const seconds = (timer % 60).toString().padStart(2, '0');
+            document.getElementById(`player${player}Time`).textContent = `${minutes}:${seconds}`;
+        }
+
+        function checkWinner() {
+            if (finished1 && finished2) {
+                gameRunning = false;
+                document.getElementById('startBtn').disabled = false;
+                
+                if (timer1 < timer2) {
+                    winner = 1;
+                    document.getElementById('player1Status').textContent = '🏆 获胜！';
+                    document.getElementById('player2Status').textContent = '再接再厉';
+                } else if (timer2 < timer1) {
+                    winner = 2;
+                    document.getElementById('player2Status').textContent = '🏆 获胜！';
+                    document.getElementById('player1Status').textContent = '再接再厉';
+                } else {
+                    winner = 0;
+                    document.getElementById('player1Status').textContent = '🤝 平局！';
+                    document.getElementById('player2Status').textContent = '🤝 平局！';
+                }
+                
+                clearInterval(timerInterval1);
+                clearInterval(timerInterval2);
+            } else if (finished1) {
+                winner = 1;
+                gameRunning = false;
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('player1Status').textContent = '🏆 获胜！';
+                document.getElementById('player2Status').textContent = '再接再厉';
+                clearInterval(timerInterval1);
+                clearInterval(timerInterval2);
+            } else if (finished2) {
+                winner = 2;
+                gameRunning = false;
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('player2Status').textContent = '🏆 获胜！';
+                document.getElementById('player1Status').textContent = '再接再厉';
+                clearInterval(timerInterval1);
+                clearInterval(timerInterval2);
+            }
+        }
+
+        function togglePause() {
+            if (!gameRunning && !gamePaused) return;
+            
+            gamePaused = !gamePaused;
+            const pauseOverlay = document.getElementById('pauseOverlay');
+            const pauseBtn = document.getElementById('pauseBtn');
+            
+            if (gamePaused) {
+                pauseOverlay.classList.add('active');
+                pauseBtn.textContent = '▶️ 继续';
+            } else {
+                pauseOverlay.classList.remove('active');
+                pauseBtn.textContent = '⏸️ 暂停';
+            }
+        }
+
+        function showShareModal() {
+            const shareModal = document.getElementById('shareModal');
+            shareModal.classList.add('active');
+            generateShareImage();
+        }
+
+        function closeShareModal() {
+            const shareModal = document.getElementById('shareModal');
+            shareModal.classList.remove('active');
+        }
+
+        function generateShareImage() {
+            const canvas = document.getElementById('shareCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#fff5eb');
+            gradient.addColorStop(1, '#ffe4c4');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#ff8c42';
+            ctx.font = 'bold 28px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🧩 拼图对战', canvas.width / 2, 50);
+            
+            ctx.fillStyle = '#333';
+            ctx.font = '18px Arial';
+            ctx.fillText(`${player1Name} vs ${player2Name}`, canvas.width / 2, 90);
+            
+            const minutes1 = Math.floor(timer1 / 60).toString().padStart(2, '0');
+            const seconds1 = (timer1 % 60).toString().padStart(2, '0');
+            const time1 = `${minutes1}:${seconds1}`;
+            
+            const minutes2 = Math.floor(timer2 / 60).toString().padStart(2, '0');
+            const seconds2 = (timer2 % 60).toString().padStart(2, '0');
+            const time2 = `${minutes2}:${seconds2}`;
+            
+            ctx.fillStyle = '#ff6b6b';
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText(`${player1Name}: ${time1}`, canvas.width / 2, 140);
+            
+            ctx.fillStyle = '#4ecdc4';
+            ctx.fillText(`${player2Name}: ${time2}`, canvas.width / 2, 180);
+            
+            let resultText = '';
+            if (winner === 1) {
+                resultText = `🏆 ${player1Name} 获胜！`;
+            } else if (winner === 2) {
+                resultText = `🏆 ${player2Name} 获胜！`;
+            } else if (winner === 0) {
+                resultText = '🤝 平局！';
+            } else {
+                resultText = '游戏进行中...';
+            }
+            
+            ctx.fillStyle = '#ff8c42';
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText(resultText, canvas.width / 2, 240);
+            
+            ctx.fillStyle = '#999';
+            ctx.font = '14px Arial';
+            ctx.fillText('情侣小游戏合集', canvas.width / 2, 280);
+        }
+
+        function downloadShareImage() {
+            const canvas = document.getElementById('shareCanvas');
+            const link = document.createElement('a');
+            link.download = '拼图对战战绩.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (gamePaused && e.code !== 'Escape') return;
+            
+            switch (e.code) {
+                case 'KeyW':
+                    moveSelection(1, 'up');
+                    break;
+                case 'KeyS':
+                    moveSelection(1, 'down');
+                    break;
+                case 'KeyA':
+                    moveSelection(1, 'left');
+                    break;
+                case 'KeyD':
+                    moveSelection(1, 'right');
+                    break;
+                case 'Space':
+                    e.preventDefault();
+                    swapTiles(1);
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    moveSelection(2, 'up');
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    moveSelection(2, 'down');
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    moveSelection(2, 'left');
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    moveSelection(2, 'right');
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    swapTiles(2);
+                    break;
+                case 'Escape':
+                    if (gameRunning) {
+                        togglePause();
+                    }
+                    break;
+            }
+        });
+
+        initBoards();
+    </script>
+</body>
+</html>
