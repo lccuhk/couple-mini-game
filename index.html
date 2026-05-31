@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双人小游戏合集 - Couple Mini Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+        }
+
+        .game-count {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .game-number {
+            display: inline-block;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            padding: 0.2rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-desc {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .game-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .play-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+        }
+
+        .game-card:hover .play-btn {
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: #4ecdc4;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .category {
+            margin-bottom: 2rem;
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-left: 1rem;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            .game-card {
+                padding: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 双人小游戏合集</h1>
+            <p class="subtitle">Couple Mini Games - 适合情侣/朋友一起玩的 10 款双人小游戏</p>
+            <span class="game-count">🎉 共 10 款游戏</span>
+        </header>
+
+        <div class="category">
+            <h2 class="category-title">🎯 经典对战</h2>
+            <div class="games-grid">
+                <a href="games/01_pong.html" class="game-card">
+                    <span class="game-number">游戏 01</span>
+                    <span class="game-icon">🏓</span>
+                    <h3 class="game-title">乒乓球对战</h3>
+                    <p class="game-desc">经典的乒乓球游戏，使用键盘控制球拍，先得5分获胜。支持音效、倒计时和获胜庆祝动画！</p>
+                    <div class="game-tags">
+                        <span class="tag">动作</span>
+                        <span class="tag">竞技</span>
+                        <span class="tag">2人</span>
+                    </div>
+                    <span class="play-btn">▶️ 开始游戏</span>
+                </a>
+
+                <a href="games/02_tic_tac_toe.html" class="game-card">
+                    <span class="game-number">游戏 02</span>
+                    <span class="game-icon">❌⭕</span>
+                    <h3 class="game-title">井字棋</h3>
+                    <p class="game-desc">经典的三连棋游戏，轮流下棋，先连成三子一线者获胜。支持比分记录和重置功能。</p>
+                    <div class="game-tags">
+                        <span class="tag">策略</span>
+                        <span class="tag">益智</span>
+                        <span class="tag">2人</span>
+                    </div>
+                    <span class="play-btn">▶️ 开始游戏</span>
+                </a>
+
+                <a href="games/07_connect_four.html" class="game-card">
+                    <span class="game-number">游戏 07</span>
+                    <span class="game-icon">🔴🔵</span>
+                    <h3 class="game-title">四子棋</h3>
+                    <p class="game-desc">策略对战游戏，轮流投放棋子，先连成四子一线者获胜。带有预览和获胜动画！</p>
+                    <div class="game-tags">
+                        <span class="tag">策略</span>
+                        <span class="tag">益智</span>
+                        <span class="tag">2人</span>
+                    </div>
+                    <span class="play-btn">▶️ 开始游戏</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2 class="category-title">🐍 动作竞技</h2>
+            <div class="games-grid">
+                <a href="games/04_snake_battle.html" class="game-card">
+                    <span class="game-number">游戏 04</span>
+                    <span class="game-icon">🐍</span>
+                    <h3 class="game-title">贪吃蛇对战</h3>
+                    <p class="game-desc">双人版贪吃蛇！控制各自的蛇吃食物长大，撞到边界、自己或对方的蛇就输了。</p>
+                    <div class="game-tags">
+                        <span class="tag">动作</span>
+                        <span class="tag">竞技</span>
+                        <span class="tag">2人</span>
+                    </div>
+                    <span class="play-btn">▶️ 开始游戏</span>
+                </a>
+
+                <a href="games/05_shooter_battle.html" class="game-card">
+                    <span class="game-number">游戏 05</span>
+                    <span class="game-icon">🎯</span>
+                    <h3 class="game-title">射击对战</h3>
+                    <p class="game-desc">双人射击对战！在各自的区域移动，发射子弹击中对方得分，先得5分获胜。</p>
+                    <div class="game-tags">
+                        <span class="tag">射击</span>
+                        <span class="tag">动作</span>
+                        <span class="tag">2人</span>
+                    </div>
+                    <span class="play-btn">▶️ 开始游戏</span>
+                </a>
+
+                <a href="games/08_whack_a_mole.html" class="game-card">
+                    <span class="game-number">游戏 08</span>
+                    <span class="game-icon">🐹</span>
+                    <h3 class="game-title">打地鼠对战</h3>
+                    <p class="game-desc">30秒限时打地鼠比赛！地鼠随机出现，快速按下对应按键得分，看谁打得更多！</p>
+                    <div class="game-tags">
+                        <span class="tag">反应</span>
+                        <span class="tag">竞速</span>
+                        <span class="tag">2人</span>
+                    </div>
+                    <span class="play-btn">▶️ 开始游戏</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2 class="category-title">🧠 益智反应</h2>
+            <div class="games-grid">
+                <a href="games/03_rock_paper_scissors.html" class="game-card">
+                    <span class="game-number">游戏 03</span>
+                    <span class="game-icon">🪨📄✂️</span>
+                    <h3 class="game-title">石头剪刀布</h3>
+                    <p class="game-desc">经典的猜拳游戏！两人轮流选择，石头赢剪刀，剪刀赢布，布赢石头。支持多回合对战。</p>
+                    <div class="game-tags">
+                        <span class="tag">休闲</span>
+                        <span class="tag">运气</span>
+                        <span class="tag">2人</span>
+                    </div>
+                    <span class="play-btn">▶️ 开始游戏</span>
+                </a>
+
+                <a href="games/06_memory_match.html" class="game-card">
+                    <span class="game-number">游戏 06</span>
+                    <span class="game-icon">🃏</span>
+                    <h3 class="game-title">记忆翻牌</h3>
+                    <p class="game-desc">考验记忆力的翻牌游戏！轮流翻开两张牌，配对成功得分，得分多者获胜。</p>
+                    <div class="game-tags">
+                        <span class="tag">记忆</span>
+                        <span class="tag">益智</span>
+                        <span class="tag">2人</span>
+                    </div>
+                    <span class="play-btn">▶️ 开始游戏</span>
+                </a>
+
+                <a href="games/09_reaction_test.html" class="game-card">
+                    <span class="game-number">游戏 09</span>
+                    <span class="game-icon">⚡</span>
+                    <h3 class="game-title">反应力测试</h3>
+                    <p class="game-desc">测试你们的反应速度！看到绿色后立即按下按键，反应更快的玩家得分。注意不要抢跑哦！</p>
+                    <div class="game-tags">
+                        <span class="tag">反应</span>
+                        <span class="tag">测试</span>
+                        <span class="tag">2人</span>
+                    </div>
+                    <span class="play-btn">▶️ 开始游戏</span>
+                </a>
+
+                <a href="games/10_number_bomb.html" class="game-card">
+                    <span class="game-number">游戏 10</span>
+                    <span class="game-icon">💣</span>
+                    <h3 class="game-title">数字炸弹</h3>
+                    <p class="game-desc">猜数字游戏！轮流猜1-100之间的数字，猜中炸弹的人输。范围会逐渐缩小，紧张刺激！</p>
+                    <div class="game-tags">
+                        <span class="tag">策略</span>
+                        <span class="tag">运气</span>
+                        <span class="tag">2人</span>
+                    </div>
+                    <span class="play-btn">▶️ 开始游戏</span>
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <p>💝 专为情侣和朋友设计的双人小游戏合集</p>
+            <p>GitHub: <a href="https://github.com/lccuhk/couple-mini-game" target="_blank">lccuhk/couple-mini-game</a></p>
+            <p style="margin-top: 0.5rem;">Made with ❤️ using HTML, CSS, JavaScript</p>
+        </footer>
+    </div>
+</body>
+</html>

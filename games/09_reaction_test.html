@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>反应力测试对战</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            padding: 20px;
+        }
+
+        .game-container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .player {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            min-width: 120px;
+        }
+
+        .player-1 {
+            background: rgba(255, 107, 107, 0.3);
+            border: 2px solid #ff6b6b;
+        }
+
+        .player-2 {
+            background: rgba(78, 205, 196, 0.3);
+            border: 2px solid #4ecdc4;
+        }
+
+        .score {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 0.3rem;
+        }
+
+        .round-info {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .game-area {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .game-area.waiting {
+            background: rgba(255, 193, 7, 0.2);
+            border-color: #ffc107;
+        }
+
+        .game-area.ready {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4caf50;
+            animation: pulse 0.5s ease infinite alternate;
+        }
+
+        .game-area.result {
+            background: rgba(33, 150, 243, 0.2);
+            border-color: #2196f3;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.02); }
+        }
+
+        .prompt {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .instruction {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .reaction-times {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .reaction-time {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+        }
+
+        .reaction-time.fast {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .reaction-time.slow {
+            color: #ff9800;
+        }
+
+        .winner-announcement {
+            font-size: 1.5rem;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            margin-top: 1rem;
+            animation: bounce 0.5s ease infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        .controls {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-info h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .key {
+            display: inline-block;
+            background: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            margin: 0.2rem;
+            font-family: monospace;
+            font-size: 1.2rem;
+            border: 1px solid #555;
+            box-shadow: 0 2px 0 #222;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.secondary {
+            background: linear-gradient(90deg, #666, #444);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 500px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .prompt {
+                font-size: 1.5rem;
+            }
+            .controls {
+                gap: 1rem;
+            }
+            .control-info {
+                padding: 0.5rem 1rem;
+            }
+            .key {
+                padding: 0.4rem 0.8rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="location.href='../index.html'">← 返回</button>
+    
+    <div class="game-container">
+        <h1>⚡ 反应力测试对战</h1>
+        
+        <div class="scoreboard">
+            <div class="player player-1">
+                <div>🔴 玩家 1</div>
+                <div class="score" id="score1">0</div>
+            </div>
+            <div class="player player-2">
+                <div>🔵 玩家 2</div>
+                <div class="score" id="score2">0</div>
+            </div>
+        </div>
+
+        <div class="round-info" id="roundInfo">第 1 轮 / 共 5 轮</div>
+
+        <div class="game-area" id="gameArea">
+            <div class="prompt" id="prompt">准备好了吗？</div>
+            <div class="instruction" id="instruction">按 空格键 开始下一轮</div>
+        </div>
+
+        <div class="reaction-times" id="reactionTimes" style="display: none;">
+            <div class="reaction-time" id="time1">玩家1: -- ms</div>
+            <div class="reaction-time" id="time2">玩家2: -- ms</div>
+        </div>
+
+        <div class="stats">
+            <div>最快反应: <span id="fastestTime">-- ms</span></div>
+            <div>平均反应: <span id="avgTime">-- ms</span></div>
+        </div>
+
+        <div class="controls">
+            <div class="control-info">
+                <h3>🎮 玩家 1</h3>
+                <span class="key">Q</span> 按下
+            </div>
+            <div class="control-info">
+                <h3>🎮 玩家 2</h3>
+                <span class="key">P</span> 按下
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="startBtn">▶️ 开始游戏</button>
+            <button id="resetBtn" class="secondary">🔄 重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        const gameArea = document.getElementById('gameArea');
+        const promptEl = document.getElementById('prompt');
+        const instructionEl = document.getElementById('instruction');
+        const score1El = document.getElementById('score1');
+        const score2El = document.getElementById('score2');
+        const roundInfoEl = document.getElementById('roundInfo');
+        const reactionTimesEl = document.getElementById('reactionTimes');
+        const time1El = document.getElementById('time1');
+        const time2El = document.getElementById('time2');
+        const fastestTimeEl = document.getElementById('fastestTime');
+        const avgTimeEl = document.getElementById('avgTime');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        const TOTAL_ROUNDS = 5;
+        let currentRound = 1;
+        let score1 = 0;
+        let score2 = 0;
+        let gameState = 'idle';
+        let startTime = 0;
+        let timeoutId = null;
+        let player1Time = null;
+        let player2Time = null;
+        let allTimes = [];
+        let roundStarted = false;
+
+        function initGame() {
+            currentRound = 1;
+            score1 = 0;
+            score2 = 0;
+            allTimes = [];
+            gameState = 'idle';
+            roundStarted = false;
+            
+            updateScore();
+            updateRoundInfo();
+            resetDisplay();
+            updateStats();
+        }
+
+        function updateScore() {
+            score1El.textContent = score1;
+            score2El.textContent = score2;
+        }
+
+        function updateRoundInfo() {
+            roundInfoEl.textContent = `第 ${currentRound} 轮 / 共 ${TOTAL_ROUNDS} 轮`;
+        }
+
+        function resetDisplay() {
+            gameArea.className = 'game-area';
+            promptEl.textContent = '准备好了吗？';
+            instructionEl.textContent = '按 空格键 开始下一轮';
+            reactionTimesEl.style.display = 'none';
+            startBtn.textContent = '▶️ 开始游戏';
+        }
+
+        function updateStats() {
+            if (allTimes.length > 0) {
+                const fastest = Math.min(...allTimes);
+                const avg = Math.round(allTimes.reduce((a, b) => a + b, 0) / allTimes.length);
+                fastestTimeEl.textContent = `${fastest} ms`;
+                avgTimeEl.textContent = `${avg} ms`;
+            } else {
+                fastestTimeEl.textContent = '-- ms';
+                avgTimeEl.textContent = '-- ms';
+            }
+        }
+
+        function startRound() {
+            if (gameState !== 'idle') return;
+            
+            gameState = 'waiting';
+            roundStarted = false;
+            player1Time = null;
+            player2Time = null;
+            
+            gameArea.className = 'game-area waiting';
+            promptEl.textContent = '等待...';
+            instructionEl.textContent = '看到绿色后立即按下你的按键！';
+            reactionTimesEl.style.display = 'none';
+            startBtn.textContent = '⏸️ 进行中';
+            
+            const delay = Math.random() * 3000 + 1000;
+            timeoutId = setTimeout(() => {
+                gameState = 'ready';
+                roundStarted = true;
+                startTime = Date.now();
+                gameArea.className = 'game-area ready';
+                promptEl.textContent = '按！';
+                instructionEl.textContent = '快！快！快！';
+            }, delay);
+        }
+
+        function handlePress(player) {
+            if (gameState === 'waiting') {
+                clearTimeout(timeoutId);
+                gameState = 'result';
+                gameArea.className = 'game-area result';
+                
+                const otherPlayer = player === 1 ? 2 : 1;
+                promptEl.innerHTML = `<span style="color: #ff6b6b;">太早了！</span>`;
+                instructionEl.textContent = `玩家 ${player} 抢跑了！玩家 ${otherPlayer} 得分`;
+                
+                if (player === 1) {
+                    score2++;
+                } else {
+                    score1++;
+                }
+                updateScore();
+                
+                showRoundResult();
+                return;
+            }
+            
+            if (gameState !== 'ready') return;
+            
+            const reactionTime = Date.now() - startTime;
+            
+            if (player === 1 && player1Time === null) {
+                player1Time = reactionTime;
+            } else if (player === 2 && player2Time === null) {
+                player2Time = reactionTime;
+            }
+            
+            if (player1Time !== null && player2Time !== null) {
+                gameState = 'result';
+                gameArea.className = 'game-area result';
+                
+                allTimes.push(player1Time, player2Time);
+                
+                if (player1Time < player2Time) {
+                    score1++;
+                    promptEl.innerHTML = `<span style="color: #ff6b6b;">玩家 1 更快！</span>`;
+                    instructionEl.textContent = `玩家 1 反应时间: ${player1Time}ms vs 玩家 2: ${player2Time}ms`;
+                    time1El.className = 'reaction-time fast';
+                    time2El.className = 'reaction-time slow';
+                } else if (player2Time < player1Time) {
+                    score2++;
+                    promptEl.innerHTML = `<span style="color: #4ecdc4;">玩家 2 更快！</span>`;
+                    instructionEl.textContent = `玩家 2 反应时间: ${player2Time}ms vs 玩家 1: ${player1Time}ms`;
+                    time1El.className = 'reaction-time slow';
+                    time2El.className = 'reaction-time fast';
+                } else {
+                    promptEl.innerHTML = `<span style="color: #ffd700;">平局！</span>`;
+                    instructionEl.textContent = `双方反应时间相同: ${player1Time}ms`;
+                    time1El.className = 'reaction-time';
+                    time2El.className = 'reaction-time';
+                }
+                
+                time1El.textContent = `玩家1: ${player1Time} ms`;
+                time2El.textContent = `玩家2: ${player2Time} ms`;
+                reactionTimesEl.style.display = 'flex';
+                
+                updateScore();
+                updateStats();
+                showRoundResult();
+            }
+        }
+
+        function showRoundResult() {
+            if (currentRound >= TOTAL_ROUNDS) {
+                setTimeout(() => {
+                    showFinalResult();
+                }, 2000);
+            } else {
+                currentRound++;
+                updateRoundInfo();
+                setTimeout(() => {
+                    gameState = 'idle';
+                    resetDisplay();
+                }, 2000);
+            }
+        }
+
+        function showFinalResult() {
+            gameState = 'finished';
+            gameArea.className = 'game-area result';
+            
+            let result;
+            if (score1 > score2) {
+                result = `<div class="winner-announcement">🎉 玩家 1 获胜！🎉</div>`;
+            } else if (score2 > score1) {
+                result = `<div class="winner-announcement">🎉 玩家 2 获胜！🎉</div>`;
+            } else {
+                result = `<div class="winner-announcement">🤝 平局！</div>`;
+            }
+            
+            promptEl.innerHTML = result;
+            instructionEl.innerHTML = `最终比分: ${score1} - ${score2}<br>按 R 键重新开始`;
+            reactionTimesEl.style.display = 'none';
+            startBtn.textContent = '🔄 再来一局';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            
+            if (key === ' ') {
+                e.preventDefault();
+                if (gameState === 'idle') {
+                    startRound();
+                }
+                return;
+            }
+            
+            if (key === 'r') {
+                resetGame();
+                return;
+            }
+            
+            if (key === 'q') {
+                handlePress(1);
+            } else if (key === 'p') {
+                handlePress(2);
+            }
+        });
+
+        function resetGame() {
+            clearTimeout(timeoutId);
+            initGame();
+        }
+
+        startBtn.addEventListener('click', () => {
+            if (gameState === 'idle') {
+                startRound();
+            } else if (gameState === 'finished') {
+                resetGame();
+            }
+        });
+        resetBtn.addEventListener('click', resetGame);
+        
+        initGame();
+    </script>
+</body>
+</html>

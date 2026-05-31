@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四子棋对战</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            padding: 20px;
+        }
+
+        .game-container {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .player {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .player.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .player-1 {
+            background: rgba(255, 107, 107, 0.3);
+            border: 2px solid #ff6b6b;
+        }
+
+        .player-1.active {
+            background: rgba(255, 107, 107, 0.5);
+            border-color: #ffd700;
+        }
+
+        .player-2 {
+            background: rgba(78, 205, 196, 0.3);
+            border: 2px solid #4ecdc4;
+        }
+
+        .player-2.active {
+            background: rgba(78, 205, 196, 0.5);
+            border-color: #ffd700;
+        }
+
+        .score {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 0.3rem;
+        }
+
+        .game-status {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            min-height: 1.5rem;
+        }
+
+        .winner {
+            font-size: 1.5rem;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(7, 60px);
+            grid-template-rows: repeat(6, 60px);
+            gap: 5px;
+            background: #1e3a8a;
+            padding: 10px;
+            border-radius: 15px;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .cell {
+            background: #0f172a;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .cell:hover:not(.taken) {
+            background: #1e293b;
+            transform: scale(1.05);
+        }
+
+        .cell.preview-red::before {
+            content: '';
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            background: rgba(255, 107, 107, 0.4);
+        }
+
+        .cell.preview-yellow::before {
+            content: '';
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            background: rgba(78, 205, 196, 0.4);
+        }
+
+        .cell.red {
+            background: #ff6b6b;
+            box-shadow: inset 0 -5px 10px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 107, 107, 0.5);
+            animation: drop 0.5s ease;
+        }
+
+        .cell.yellow {
+            background: #4ecdc4;
+            box-shadow: inset 0 -5px 10px rgba(0, 0, 0, 0.3), 0 0 15px rgba(78, 205, 196, 0.5);
+            animation: drop 0.5s ease;
+        }
+
+        .cell.winner {
+            animation: winnerPulse 0.5s ease infinite alternate;
+        }
+
+        @keyframes drop {
+            from { transform: translateY(-300px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes winnerPulse {
+            from { transform: scale(1); box-shadow: 0 0 10px #ffd700; }
+            to { transform: scale(1.1); box-shadow: 0 0 30px #ffd700; }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.secondary {
+            background: linear-gradient(90deg, #666, #444);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .board {
+                grid-template-columns: repeat(7, 40px);
+                grid-template-rows: repeat(6, 40px);
+                gap: 3px;
+                padding: 8px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .scoreboard {
+                gap: 1rem;
+            }
+            .player {
+                padding: 0.5rem 1rem;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="location.href='../index.html'">← 返回</button>
+    
+    <div class="game-container">
+        <h1>🔴🔵 四子棋对战</h1>
+        
+        <div class="scoreboard">
+            <div class="player player-1 active" id="player1">
+                <div>🔴 玩家 1</div>
+                <div class="score" id="score1">0</div>
+            </div>
+            <div class="player player-2" id="player2">
+                <div>🔵 玩家 2</div>
+                <div class="score" id="score2">0</div>
+            </div>
+        </div>
+
+        <div class="game-status" id="gameStatus">玩家 1 的回合 - 点击列放置棋子</div>
+
+        <div class="board" id="board"></div>
+
+        <div class="button-group">
+            <button id="restartBtn">🔄 重新开始</button>
+            <button id="resetScoreBtn" class="secondary">📊 重置比分</button>
+        </div>
+    </div>
+
+    <script>
+        const ROWS = 6;
+        const COLS = 7;
+        const board = document.getElementById('board');
+        const score1El = document.getElementById('score1');
+        const score2El = document.getElementById('score2');
+        const player1El = document.getElementById('player1');
+        const player2El = document.getElementById('player2');
+        const gameStatusEl = document.getElementById('gameStatus');
+        const restartBtn = document.getElementById('restartBtn');
+        const resetScoreBtn = document.getElementById('resetScoreBtn');
+
+        let grid = [];
+        let currentPlayer = 1;
+        let gameActive = true;
+        let score1 = 0;
+        let score2 = 0;
+
+        function initGame() {
+            grid = Array(ROWS).fill(null).map(() => Array(COLS).fill(0));
+            currentPlayer = 1;
+            gameActive = true;
+            
+            board.innerHTML = '';
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.addEventListener('click', () => handleClick(col));
+                    cell.addEventListener('mouseenter', () => handleHover(col, true));
+                    cell.addEventListener('mouseleave', () => handleHover(col, false));
+                    board.appendChild(cell);
+                }
+            }
+            
+            updatePlayerHighlight();
+            updateStatus();
+        }
+
+        function handleHover(col, isEnter) {
+            if (!gameActive) return;
+            
+            const row = getAvailableRow(col);
+            if (row === -1) return;
+            
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.classList.remove('preview-red', 'preview-yellow');
+            });
+            
+            if (isEnter) {
+                const index = row * COLS + col;
+                const previewClass = currentPlayer === 1 ? 'preview-red' : 'preview-yellow';
+                cells[index].classList.add(previewClass);
+            }
+        }
+
+        function handleClick(col) {
+            if (!gameActive) return;
+            
+            const row = getAvailableRow(col);
+            if (row === -1) return;
+            
+            grid[row][col] = currentPlayer;
+            const index = row * COLS + col;
+            const cells = document.querySelectorAll('.cell');
+            cells[index].classList.add(currentPlayer === 1 ? 'red' : 'yellow');
+            cells[index].classList.remove('preview-red', 'preview-yellow');
+            
+            if (checkWin(row, col)) {
+                gameActive = false;
+                highlightWinningCells(row, col);
+                updateScore();
+                gameStatusEl.innerHTML = `<span class="winner">🎉 玩家 ${currentPlayer} 获胜！🎉</span>`;
+                return;
+            }
+            
+            if (checkDraw()) {
+                gameActive = false;
+                gameStatusEl.textContent = '🤝 平局！';
+                return;
+            }
+            
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            updatePlayerHighlight();
+            updateStatus();
+        }
+
+        function getAvailableRow(col) {
+            for (let row = ROWS - 1; row >= 0; row--) {
+                if (grid[row][col] === 0) return row;
+            }
+            return -1;
+        }
+
+        function checkWin(row, col) {
+            const directions = [
+                [[0, 1], [0, -1]],
+                [[1, 0], [-1, 0]],
+                [[1, 1], [-1, -1]],
+                [[1, -1], [-1, 1]]
+            ];
+            
+            for (const [dir1, dir2] of directions) {
+                let count = 1;
+                count += countDirection(row, col, dir1[0], dir1[1]);
+                count += countDirection(row, col, dir2[0], dir2[1]);
+                if (count >= 4) return true;
+            }
+            return false;
+        }
+
+        function countDirection(row, col, dRow, dCol) {
+            let count = 0;
+            let r = row + dRow;
+            let c = col + dCol;
+            
+            while (r >= 0 && r < ROWS && c >= 0 && c < COLS && grid[r][c] === currentPlayer) {
+                count++;
+                r += dRow;
+                c += dCol;
+            }
+            return count;
+        }
+
+        function highlightWinningCells(row, col) {
+            const directions = [
+                [[0, 1], [0, -1]],
+                [[1, 0], [-1, 0]],
+                [[1, 1], [-1, -1]],
+                [[1, -1], [-1, 1]]
+            ];
+            
+            const cells = document.querySelectorAll('.cell');
+            
+            for (const [dir1, dir2] of directions) {
+                const winningCells = [[row, col]];
+                
+                let r = row + dir1[0], c = col + dir1[1];
+                while (r >= 0 && r < ROWS && c >= 0 && c < COLS && grid[r][c] === currentPlayer) {
+                    winningCells.push([r, c]);
+                    r += dir1[0];
+                    c += dir1[1];
+                }
+                
+                r = row + dir2[0];
+                c = col + dir2[1];
+                while (r >= 0 && r < ROWS && c >= 0 && c < COLS && grid[r][c] === currentPlayer) {
+                    winningCells.push([r, c]);
+                    r += dir2[0];
+                    c += dir2[1];
+                }
+                
+                if (winningCells.length >= 4) {
+                    winningCells.forEach(([r, c]) => {
+                        const index = r * COLS + c;
+                        cells[index].classList.add('winner');
+                    });
+                    break;
+                }
+            }
+        }
+
+        function checkDraw() {
+            return grid[0].every(cell => cell !== 0);
+        }
+
+        function updateScore() {
+            if (currentPlayer === 1) {
+                score1++;
+                score1El.textContent = score1;
+            } else {
+                score2++;
+                score2El.textContent = score2;
+            }
+        }
+
+        function updatePlayerHighlight() {
+            player1El.classList.toggle('active', currentPlayer === 1);
+            player2El.classList.toggle('active', currentPlayer === 2);
+        }
+
+        function updateStatus() {
+            gameStatusEl.textContent = `玩家 ${currentPlayer} 的回合 - 点击列放置棋子`;
+        }
+
+        function resetScore() {
+            score1 = 0;
+            score2 = 0;
+            score1El.textContent = score1;
+            score2El.textContent = score2;
+            initGame();
+        }
+
+        restartBtn.addEventListener('click', initGame);
+        resetScoreBtn.addEventListener('click', resetScore);
+        
+        initGame();
+    </script>
+</body>
+</html>

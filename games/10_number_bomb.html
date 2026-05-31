@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字炸弹对战</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            padding: 20px;
+        }
+
+        .game-container {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .player {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .player.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .player-1 {
+            background: rgba(255, 107, 107, 0.3);
+            border: 2px solid #ff6b6b;
+        }
+
+        .player-1.active {
+            background: rgba(255, 107, 107, 0.5);
+            border-color: #ffd700;
+        }
+
+        .player-2 {
+            background: rgba(78, 205, 196, 0.3);
+            border: 2px solid #4ecdc4;
+        }
+
+        .player-2.active {
+            background: rgba(78, 205, 196, 0.5);
+            border-color: #ffd700;
+        }
+
+        .score {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 0.3rem;
+        }
+
+        .round-info {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .game-area {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .range-display {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .range-highlight {
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .bomb-display {
+            font-size: 4rem;
+            margin: 1rem 0;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .bomb-display.explode {
+            animation: explode 0.5s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .instruction {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .input-area {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="number"] {
+            padding: 0.8rem 1.5rem;
+            font-size: 1.5rem;
+            width: 150px;
+            text-align: center;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            font-weight: bold;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        button {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            border: none;
+            border-radius: 25px;
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background: linear-gradient(90deg, #666, #444);
+            color: white;
+        }
+
+        .history {
+            margin-top: 1.5rem;
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .history h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .history-item {
+            padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item .player1 {
+            color: #ff6b6b;
+        }
+
+        .history-item .player2 {
+            color: #4ecdc4;
+        }
+
+        .result {
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            min-height: 2rem;
+        }
+
+        .result.winner {
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .quick-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .quick-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: none;
+        }
+
+        @media (max-width: 500px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .bomb-display {
+                font-size: 3rem;
+            }
+            .range-display {
+                font-size: 1.2rem;
+            }
+            input[type="number"] {
+                font-size: 1.2rem;
+                width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="location.href='../index.html'">← 返回</button>
+    
+    <div class="game-container">
+        <h1>💣 数字炸弹对战</h1>
+        
+        <div class="scoreboard">
+            <div class="player player-1 active" id="player1">
+                <div>🔴 玩家 1</div>
+                <div class="score" id="score1">0</div>
+            </div>
+            <div class="player player-2" id="player2">
+                <div>🔵 玩家 2</div>
+                <div class="score" id="score2">0</div>
+            </div>
+        </div>
+
+        <div class="round-info" id="roundInfo">第 1 轮</div>
+
+        <div class="game-area">
+            <div class="range-display">
+                范围: <span class="range-highlight" id="minRange">1</span> - 
+                <span class="range-highlight" id="maxRange">100</span>
+            </div>
+            
+            <div class="bomb-display" id="bombDisplay">💣</div>
+            
+            <div class="instruction" id="instruction">玩家 1 请输入一个数字</div>
+            
+            <div class="input-area">
+                <input type="number" id="numberInput" placeholder="?" min="1" max="100">
+                <button id="submitBtn">确定</button>
+            </div>
+            
+            <div class="quick-buttons" id="quickButtons"></div>
+            
+            <div class="result" id="result"></div>
+        </div>
+
+        <div class="history">
+            <h3>📜 猜测历史</h3>
+            <div id="historyList"></div>
+        </div>
+
+        <div class="button-group">
+            <button id="newRoundBtn" class="secondary" style="display: none;">🔄 新一轮</button>
+            <button id="resetBtn" class="secondary">📊 重置比分</button>
+        </div>
+    </div>
+
+    <script>
+        const player1El = document.getElementById('player1');
+        const player2El = document.getElementById('player2');
+        const score1El = document.getElementById('score1');
+        const score2El = document.getElementById('score2');
+        const roundInfoEl = document.getElementById('roundInfo');
+        const minRangeEl = document.getElementById('minRange');
+        const maxRangeEl = document.getElementById('maxRange');
+        const bombDisplay = document.getElementById('bombDisplay');
+        const instructionEl = document.getElementById('instruction');
+        const numberInput = document.getElementById('numberInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultEl = document.getElementById('result');
+        const historyList = document.getElementById('historyList');
+        const quickButtons = document.getElementById('quickButtons');
+        const newRoundBtn = document.getElementById('newRoundBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        let bombNumber = 0;
+        let minRange = 1;
+        let maxRange = 100;
+        let currentPlayer = 1;
+        let score1 = 0;
+        let score2 = 0;
+        let round = 1;
+        let gameOver = false;
+        let history = [];
+
+        function initGame() {
+            bombNumber = Math.floor(Math.random() * 100) + 1;
+            minRange = 1;
+            maxRange = 100;
+            currentPlayer = 1;
+            gameOver = false;
+            history = [];
+            
+            updateRange();
+            updatePlayerHighlight();
+            updateInstruction();
+            updateHistory();
+            updateQuickButtons();
+            
+            resultEl.textContent = '';
+            resultEl.className = 'result';
+            bombDisplay.textContent = '💣';
+            bombDisplay.className = 'bomb-display';
+            newRoundBtn.style.display = 'none';
+            submitBtn.disabled = false;
+            numberInput.value = '';
+            numberInput.focus();
+            
+            console.log('Bomb number:', bombNumber);
+        }
+
+        function updateRange() {
+            minRangeEl.textContent = minRange;
+            maxRangeEl.textContent = maxRange;
+        }
+
+        function updatePlayerHighlight() {
+            player1El.classList.toggle('active', currentPlayer === 1);
+            player2El.classList.toggle('active', currentPlayer === 2);
+        }
+
+        function updateInstruction() {
+            instructionEl.textContent = `玩家 ${currentPlayer} 请输入一个数字 (${minRange}-${maxRange})`;
+        }
+
+        function updateHistory() {
+            historyList.innerHTML = history.map(item => {
+                const playerClass = item.player === 1 ? 'player1' : 'player2';
+                return `<div class="history-item"><span class="${playerClass}">玩家${item.player}</span>: ${item.number} → ${item.result}</div>`;
+            }).join('');
+            historyList.scrollTop = historyList.scrollHeight;
+        }
+
+        function updateQuickButtons() {
+            const range = maxRange - minRange;
+            const mid = Math.floor((minRange + maxRange) / 2);
+            const q1 = Math.floor(minRange + range * 0.25);
+            const q3 = Math.floor(minRange + range * 0.75);
+            
+            const buttons = [minRange, q1, mid, q3, maxRange].filter((v, i, a) => a.indexOf(v) === i);
+            
+            quickButtons.innerHTML = buttons.map(num => 
+                `<button class="quick-btn" onclick="quickSelect(${num})" ${gameOver ? 'disabled' : ''}>${num}</button>`
+            ).join('');
+        }
+
+        function quickSelect(num) {
+            if (gameOver) return;
+            numberInput.value = num;
+            submitGuess();
+        }
+
+        function submitGuess() {
+            if (gameOver) return;
+            
+            const guess = parseInt(numberInput.value);
+            
+            if (isNaN(guess) || guess < minRange || guess > maxRange) {
+                resultEl.textContent = `请输入 ${minRange} 到 ${maxRange} 之间的数字！`;
+                resultEl.className = 'result';
+                return;
+            }
+            
+            if (guess === bombNumber) {
+                gameOver = true;
+                bombDisplay.classList.add('explode');
+                
+                setTimeout(() => {
+                    bombDisplay.textContent = '💥';
+                    bombDisplay.className = 'bomb-display';
+                }, 500);
+                
+                const winner = currentPlayer === 1 ? 2 : 1;
+                if (winner === 1) {
+                    score1++;
+                    score1El.textContent = score1;
+                } else {
+                    score2++;
+                    score2El.textContent = score2;
+                }
+                
+                history.push({
+                    player: currentPlayer,
+                    number: guess,
+                    result: '💥 爆炸！'
+                });
+                
+                resultEl.innerHTML = `<span class="result winner">💥 炸弹爆炸！玩家 ${winner} 获胜！💥</span>`;
+                instructionEl.textContent = `炸弹数字是: ${bombNumber}`;
+                
+                submitBtn.disabled = true;
+                newRoundBtn.style.display = 'inline-block';
+                updateHistory();
+                return;
+            }
+            
+            let resultText = '';
+            if (guess < bombNumber) {
+                minRange = guess + 1;
+                resultText = `太小了！范围缩小到 ${minRange}-${maxRange}`;
+            } else {
+                maxRange = guess - 1;
+                resultText = `太大了！范围缩小到 ${minRange}-${maxRange}`;
+            }
+            
+            history.push({
+                player: currentPlayer,
+                number: guess,
+                result: resultText
+            });
+            
+            resultEl.textContent = resultText;
+            resultEl.className = 'result';
+            
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            
+            updateRange();
+            updatePlayerHighlight();
+            updateInstruction();
+            updateHistory();
+            updateQuickButtons();
+            
+            numberInput.value = '';
+            numberInput.focus();
+        }
+
+        function newRound() {
+            round++;
+            roundInfoEl.textContent = `第 ${round} 轮`;
+            initGame();
+        }
+
+        function resetScore() {
+            score1 = 0;
+            score2 = 0;
+            round = 1;
+            score1El.textContent = score1;
+            score2El.textContent = score2;
+            roundInfoEl.textContent = '第 1 轮';
+            initGame();
+        }
+
+        submitBtn.addEventListener('click', submitGuess);
+        numberInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitGuess();
+            }
+        });
+        newRoundBtn.addEventListener('click', newRound);
+        resetBtn.addEventListener('click', resetScore);
+
+        window.quickSelect = quickSelect;
+        
+        initGame();
+    </script>
+</body>
+</html>

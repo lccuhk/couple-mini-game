@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>射击对战</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            padding: 20px;
+        }
+
+        .game-container {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .player {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            min-width: 120px;
+        }
+
+        .player-1 {
+            background: rgba(255, 107, 107, 0.3);
+            border: 2px solid #ff6b6b;
+        }
+
+        .player-2 {
+            background: rgba(78, 205, 196, 0.3);
+            border: 2px solid #4ecdc4;
+        }
+
+        .score {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 0.3rem;
+        }
+
+        .game-status {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            min-height: 1.5rem;
+        }
+
+        .winner {
+            font-size: 1.5rem;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        #gameCanvas {
+            border: 3px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.2), 0 0 60px rgba(78, 205, 196, 0.1);
+            background: #0a0a0a;
+        }
+
+        .controls {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-info h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .key {
+            display: inline-block;
+            background: #333;
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            margin: 0.2rem;
+            font-family: monospace;
+            border: 1px solid #555;
+            box-shadow: 0 2px 0 #222;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.secondary {
+            background: linear-gradient(90deg, #666, #444);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            #gameCanvas {
+                width: 100%;
+                max-width: 350px;
+                height: auto;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .controls {
+                gap: 1rem;
+            }
+            .control-info {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="location.href='../index.html'">← 返回</button>
+    
+    <div class="game-container">
+        <h1>🎯 射击对战</h1>
+        
+        <div class="scoreboard">
+            <div class="player player-1">
+                <div>🔴 玩家 1</div>
+                <div class="score" id="score1">0</div>
+            </div>
+            <div class="player player-2">
+                <div>🔵 玩家 2</div>
+                <div class="score" id="score2">0</div>
+            </div>
+        </div>
+
+        <div class="game-status" id="gameStatus">按 空格键 开始游戏</div>
+
+        <canvas id="gameCanvas" width="800" height="400" tabindex="0"></canvas>
+
+        <div class="controls">
+            <div class="control-info">
+                <h3>🎮 玩家 1 控制</h3>
+                <span class="key">W</span> 上<br>
+                <span class="key">S</span> 下<br>
+                <span class="key">A</span> 左<br>
+                <span class="key">D</span> 右<br>
+                <span class="key">F</span> 射击
+            </div>
+            <div class="control-info">
+                <h3>🎮 玩家 2 控制</h3>
+                <span class="key">↑</span> 上<br>
+                <span class="key">↓</span> 下<br>
+                <span class="key">←</span> 左<br>
+                <span class="key">→</span> 右<br>
+                <span class="key">/</span> 射击
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="restartBtn">🔄 重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const score1El = document.getElementById('score1');
+        const score2El = document.getElementById('score2');
+        const gameStatusEl = document.getElementById('gameStatus');
+        const restartBtn = document.getElementById('restartBtn');
+
+        const PLAYER_SIZE = 30;
+        const BULLET_SIZE = 6;
+        const PLAYER_SPEED = 5;
+        const BULLET_SPEED = 10;
+        const SHOOT_COOLDOWN = 300;
+        const WINNING_SCORE = 5;
+
+        let gameRunning = false;
+        let score1 = 0;
+        let score2 = 0;
+
+        let player1, player2;
+        let bullets1, bullets2;
+
+        function initGame() {
+            player1 = {
+                x: 100,
+                y: canvas.height / 2 - PLAYER_SIZE / 2,
+                width: PLAYER_SIZE,
+                height: PLAYER_SIZE,
+                color: '#ff6b6b',
+                lastShot: 0,
+                lives: 3
+            };
+
+            player2 = {
+                x: canvas.width - 100 - PLAYER_SIZE,
+                y: canvas.height / 2 - PLAYER_SIZE / 2,
+                width: PLAYER_SIZE,
+                height: PLAYER_SIZE,
+                color: '#4ecdc4',
+                lastShot: 0,
+                lives: 3
+            };
+
+            bullets1 = [];
+            bullets2 = [];
+            
+            score1 = 0;
+            score2 = 0;
+            updateScore();
+            draw();
+        }
+
+        function updateScore() {
+            score1El.textContent = score1;
+            score2El.textContent = score2;
+        }
+
+        const keys = {};
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            keys[key] = true;
+            
+            if (['w', 'a', 's', 'd', 'f', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', '/', ' '].includes(key)) {
+                e.preventDefault();
+            }
+            
+            if (key === ' ') {
+                canvas.focus();
+                if (!gameRunning) {
+                    startGame();
+                }
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        function updatePlayers() {
+            if (keys['w']) player1.y -= PLAYER_SPEED;
+            if (keys['s']) player1.y += PLAYER_SPEED;
+            if (keys['a']) player1.x -= PLAYER_SPEED;
+            if (keys['d']) player1.x += PLAYER_SPEED;
+            
+            if (keys['arrowup']) player2.y -= PLAYER_SPEED;
+            if (keys['arrowdown']) player2.y += PLAYER_SPEED;
+            if (keys['arrowleft']) player2.x -= PLAYER_SPEED;
+            if (keys['arrowright']) player2.x += PLAYER_SPEED;
+
+            player1.x = Math.max(0, Math.min(canvas.width / 2 - PLAYER_SIZE, player1.x));
+            player1.y = Math.max(0, Math.min(canvas.height - PLAYER_SIZE, player1.y));
+            
+            player2.x = Math.max(canvas.width / 2, Math.min(canvas.width - PLAYER_SIZE, player2.x));
+            player2.y = Math.max(0, Math.min(canvas.height - PLAYER_SIZE, player2.y));
+
+            const now = Date.now();
+            
+            if (keys['f'] && now - player1.lastShot > SHOOT_COOLDOWN) {
+                bullets1.push({
+                    x: player1.x + PLAYER_SIZE,
+                    y: player1.y + PLAYER_SIZE / 2 - BULLET_SIZE / 2,
+                    dx: BULLET_SPEED,
+                    dy: 0
+                });
+                player1.lastShot = now;
+            }
+            
+            if (keys['/'] && now - player2.lastShot > SHOOT_COOLDOWN) {
+                bullets2.push({
+                    x: player2.x - BULLET_SIZE,
+                    y: player2.y + PLAYER_SIZE / 2 - BULLET_SIZE / 2,
+                    dx: -BULLET_SPEED,
+                    dy: 0
+                });
+                player2.lastShot = now;
+            }
+        }
+
+        function updateBullets() {
+            bullets1 = bullets1.filter(bullet => {
+                bullet.x += bullet.dx;
+                bullet.y += bullet.dy;
+                
+                if (bullet.x > canvas.width) return false;
+                
+                if (checkCollision(bullet, player2)) {
+                    score1++;
+                    updateScore();
+                    if (score1 >= WINNING_SCORE) {
+                        endGame(1);
+                    } else {
+                        respawnPlayer(player2);
+                    }
+                    return false;
+                }
+                
+                return true;
+            });
+
+            bullets2 = bullets2.filter(bullet => {
+                bullet.x += bullet.dx;
+                bullet.y += bullet.dy;
+                
+                if (bullet.x < -BULLET_SIZE) return false;
+                
+                if (checkCollision(bullet, player1)) {
+                    score2++;
+                    updateScore();
+                    if (score2 >= WINNING_SCORE) {
+                        endGame(2);
+                    } else {
+                        respawnPlayer(player1);
+                    }
+                    return false;
+                }
+                
+                return true;
+            });
+        }
+
+        function checkCollision(bullet, player) {
+            return bullet.x < player.x + player.width &&
+                   bullet.x + BULLET_SIZE > player.x &&
+                   bullet.y < player.y + player.height &&
+                   bullet.y + BULLET_SIZE > player.y;
+        }
+
+        function respawnPlayer(player) {
+            if (player === player1) {
+                player.x = 100;
+            } else {
+                player.x = canvas.width - 100 - PLAYER_SIZE;
+            }
+            player.y = canvas.height / 2 - PLAYER_SIZE / 2;
+        }
+
+        function draw() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = player1.color;
+            ctx.fillStyle = player1.color;
+            ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
+            
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(player1.x + player1.width - 5, player1.y + player1.height / 2 - 3, 8, 6);
+
+            ctx.shadowColor = player2.color;
+            ctx.fillStyle = player2.color;
+            ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
+            
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(player2.x - 3, player2.y + player2.height / 2 - 3, 8, 6);
+
+            ctx.shadowColor = '#ff6b6b';
+            ctx.fillStyle = '#ff6b6b';
+            bullets1.forEach(bullet => {
+                ctx.beginPath();
+                ctx.arc(bullet.x + BULLET_SIZE / 2, bullet.y + BULLET_SIZE / 2, BULLET_SIZE / 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.shadowColor = '#4ecdc4';
+            ctx.fillStyle = '#4ecdc4';
+            bullets2.forEach(bullet => {
+                ctx.beginPath();
+                ctx.arc(bullet.x + BULLET_SIZE / 2, bullet.y + BULLET_SIZE / 2, BULLET_SIZE / 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.shadowBlur = 0;
+        }
+
+        function update() {
+            if (!gameRunning) return;
+            
+            updatePlayers();
+            updateBullets();
+            draw();
+        }
+
+        function endGame(winner) {
+            gameRunning = false;
+            gameStatusEl.innerHTML = `<span class="winner">🎉 玩家 ${winner} 获胜！🎉</span>`;
+        }
+
+        function startGame() {
+            if (gameRunning) return;
+            
+            initGame();
+            gameRunning = true;
+            gameStatusEl.textContent = '游戏进行中...';
+            
+            gameLoop();
+        }
+
+        function resetGame() {
+            gameRunning = false;
+            initGame();
+            gameStatusEl.textContent = '按 空格键 开始游戏';
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return;
+            update();
+            requestAnimationFrame(gameLoop);
+        }
+
+        canvas.addEventListener('click', () => canvas.focus());
+        restartBtn.addEventListener('click', resetGame);
+        
+        initGame();
+    </script>
+</body>
+</html>

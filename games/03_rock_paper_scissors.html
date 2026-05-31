@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>石头剪刀布对战</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            padding: 20px;
+        }
+
+        .game-container {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+        }
+
+        .player {
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            min-width: 150px;
+        }
+
+        .player-1 {
+            background: rgba(78, 205, 196, 0.3);
+            border: 2px solid #4ecdc4;
+        }
+
+        .player-2 {
+            background: rgba(255, 107, 107, 0.3);
+            border: 2px solid #ff6b6b;
+        }
+
+        .score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        .battle-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+            margin: 2rem 0;
+        }
+
+        .player-choice {
+            text-align: center;
+        }
+
+        .choice-display {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0.5rem auto;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .choice-display.winner {
+            animation: winnerPulse 0.5s ease infinite alternate;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            border-color: #ffd700;
+        }
+
+        @keyframes winnerPulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .choice-display.shake {
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-20deg); }
+            75% { transform: rotate(20deg); }
+        }
+
+        .vs-text {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .result {
+            font-size: 1.8rem;
+            min-height: 3rem;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+
+        .result.win {
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .choices {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .choice-btn {
+            width: 80px;
+            height: 80px;
+            font-size: 2.5rem;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .choice-btn.selected {
+            background: rgba(78, 205, 196, 0.5);
+            border-color: #4ecdc4;
+        }
+
+        .player-section {
+            margin: 1rem 0;
+        }
+
+        .player-label {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            background: linear-gradient(90deg, #4ecdc4, #ff6b6b);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.secondary {
+            background: linear-gradient(90deg, #666, #444);
+        }
+
+        .round-info {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .battle-area {
+                gap: 1rem;
+            }
+            .choice-display {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+            .scoreboard {
+                gap: 1rem;
+            }
+            .player {
+                padding: 0.5rem 1rem;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="location.href='../index.html'">← 返回</button>
+    
+    <div class="game-container">
+        <h1>🪨📄✂️ 石头剪刀布</h1>
+        
+        <div class="round-info" id="roundInfo">第 1 轮 - 玩家 1 选择</div>
+
+        <div class="scoreboard">
+            <div class="player player-1">
+                <div>👤 玩家 1</div>
+                <div class="score" id="score1">0</div>
+            </div>
+            <div class="player player-2">
+                <div>👤 玩家 2</div>
+                <div class="score" id="score2">0</div>
+            </div>
+        </div>
+
+        <div class="battle-area">
+            <div class="player-choice">
+                <div>玩家 1</div>
+                <div class="choice-display" id="choice1">❓</div>
+            </div>
+            <div class="vs-text">VS</div>
+            <div class="player-choice">
+                <div>玩家 2</div>
+                <div class="choice-display" id="choice2">❓</div>
+            </div>
+        </div>
+
+        <div class="result" id="result">请玩家 1 选择</div>
+
+        <div class="player-section" id="player1Section">
+            <div class="player-label">🎮 玩家 1 选择（按 1/2/3 或点击）</div>
+            <div class="choices">
+                <button class="choice-btn" data-choice="rock" data-player="1">🪨</button>
+                <button class="choice-btn" data-choice="paper" data-player="1">📄</button>
+                <button class="choice-btn" data-choice="scissors" data-player="1">✂️</button>
+            </div>
+        </div>
+
+        <div class="player-section hidden" id="player2Section">
+            <div class="player-label">🎮 玩家 2 选择（按 1/2/3 或点击）</div>
+            <div class="choices">
+                <button class="choice-btn" data-choice="rock" data-player="2">🪨</button>
+                <button class="choice-btn" data-choice="paper" data-player="2">📄</button>
+                <button class="choice-btn" data-choice="scissors" data-player="2">✂️</button>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="nextRoundBtn" class="hidden">➡️ 下一轮</button>
+            <button id="resetBtn" class="secondary">🔄 重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        const choiceEmoji = { rock: '🪨', paper: '📄', scissors: '✂️' };
+        const choiceNames = { rock: '石头', paper: '布', scissors: '剪刀' };
+
+        const choice1El = document.getElementById('choice1');
+        const choice2El = document.getElementById('choice2');
+        const resultEl = document.getElementById('result');
+        const score1El = document.getElementById('score1');
+        const score2El = document.getElementById('score2');
+        const roundInfoEl = document.getElementById('roundInfo');
+        const player1Section = document.getElementById('player1Section');
+        const player2Section = document.getElementById('player2Section');
+        const nextRoundBtn = document.getElementById('nextRoundBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+
+        let score1 = 0;
+        let score2 = 0;
+        let round = 1;
+        let player1Choice = null;
+        let player2Choice = null;
+        let currentPlayer = 1;
+        let roundComplete = false;
+
+        function handleChoice(choice, player) {
+            if (roundComplete) return;
+            if (player !== currentPlayer) return;
+
+            if (player === 1) {
+                player1Choice = choice;
+                choice1El.textContent = '✅';
+                choice1El.classList.add('shake');
+                setTimeout(() => choice1El.classList.remove('shake'), 500);
+                
+                currentPlayer = 2;
+                player1Section.classList.add('hidden');
+                player2Section.classList.remove('hidden');
+                roundInfoEl.textContent = `第 ${round} 轮 - 玩家 2 选择`;
+                resultEl.textContent = '请玩家 2 选择';
+                
+                choiceBtns.forEach(btn => {
+                    if (btn.dataset.player === '1') {
+                        btn.classList.remove('selected');
+                    }
+                });
+            } else {
+                player2Choice = choice;
+                choice2El.textContent = '✅';
+                choice2El.classList.add('shake');
+                setTimeout(() => choice2El.classList.remove('shake'), 500);
+                
+                player2Section.classList.add('hidden');
+                determineWinner();
+            }
+
+            choiceBtns.forEach(btn => {
+                if (btn.dataset.player === player && btn.dataset.choice === choice) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+
+        function determineWinner() {
+            roundComplete = true;
+            
+            choice1El.textContent = choiceEmoji[player1Choice];
+            choice2El.textContent = choiceEmoji[player2Choice];
+
+            let result;
+            if (player1Choice === player2Choice) {
+                result = '🤝 平局！';
+                resultEl.className = 'result';
+            } else if (
+                (player1Choice === 'rock' && player2Choice === 'scissors') ||
+                (player1Choice === 'paper' && player2Choice === 'rock') ||
+                (player1Choice === 'scissors' && player2Choice === 'paper')
+            ) {
+                score1++;
+                score1El.textContent = score1;
+                result = '🎉 玩家 1 获胜！';
+                resultEl.className = 'result win';
+                choice1El.classList.add('winner');
+            } else {
+                score2++;
+                score2El.textContent = score2;
+                result = '🎉 玩家 2 获胜！';
+                resultEl.className = 'result win';
+                choice2El.classList.add('winner');
+            }
+
+            resultEl.textContent = `${choiceNames[player1Choice]} vs ${choiceNames[player2Choice]} - ${result}`;
+            nextRoundBtn.classList.remove('hidden');
+        }
+
+        function nextRound() {
+            round++;
+            player1Choice = null;
+            player2Choice = null;
+            currentPlayer = 1;
+            roundComplete = false;
+
+            choice1El.textContent = '❓';
+            choice2El.textContent = '❓';
+            choice1El.classList.remove('winner');
+            choice2El.classList.remove('winner');
+            resultEl.textContent = '请玩家 1 选择';
+            resultEl.className = 'result';
+            roundInfoEl.textContent = `第 ${round} 轮 - 玩家 1 选择`;
+            
+            player1Section.classList.remove('hidden');
+            player2Section.classList.add('hidden');
+            nextRoundBtn.classList.add('hidden');
+            
+            choiceBtns.forEach(btn => btn.classList.remove('selected'));
+        }
+
+        function resetGame() {
+            score1 = 0;
+            score2 = 0;
+            round = 1;
+            player1Choice = null;
+            player2Choice = null;
+            currentPlayer = 1;
+            roundComplete = false;
+
+            score1El.textContent = score1;
+            score2El.textContent = score2;
+            choice1El.textContent = '❓';
+            choice2El.textContent = '❓';
+            choice1El.classList.remove('winner');
+            choice2El.classList.remove('winner');
+            resultEl.textContent = '请玩家 1 选择';
+            resultEl.className = 'result';
+            roundInfoEl.textContent = '第 1 轮 - 玩家 1 选择';
+            
+            player1Section.classList.remove('hidden');
+            player2Section.classList.add('hidden');
+            nextRoundBtn.classList.add('hidden');
+            
+            choiceBtns.forEach(btn => btn.classList.remove('selected'));
+        }
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                handleChoice(btn.dataset.choice, parseInt(btn.dataset.player));
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (roundComplete) return;
+            
+            if (e.key === '1') handleChoice('rock', currentPlayer);
+            else if (e.key === '2') handleChoice('paper', currentPlayer);
+            else if (e.key === '3') handleChoice('scissors', currentPlayer);
+        });
+
+        nextRoundBtn.addEventListener('click', nextRound);
+        resetBtn.addEventListener('click', resetGame);
+    </script>
+</body>
+</html>
