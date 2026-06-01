@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>羽毛球对战 - 情侣小游戏</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-gradient-1: #fff5eb; --bg-gradient-2: #ffe4c4;
+            --primary-color: #ff8c42; --secondary-color: #ff6b35;
+            --accent-color: #ffd166; --text-color: #333;
+            --card-bg: rgba(255,255,255,0.9); --border-color: #ff8c42;
+            --shadow: 0 8px 32px rgba(255,140,66,0.3);
+            --player1-color: #ff6b6b; --player2-color: #4ecdc4;
+            --court-color: #27ae60; --net-color: white;
+        }
+        [data-theme="orange"] { --bg-gradient-1: #fff5eb; --bg-gradient-2: #ffe4c4; --primary-color: #ff8c42; --secondary-color: #ff6b35; --accent-color: #ffd166; --border-color: #ff8c42; --shadow: 0 8px 32px rgba(255,140,66,0.3); }
+        [data-theme="pink"] { --bg-gradient-1: #fff0f5; --bg-gradient-2: #ffe4ec; --primary-color: #ff6b9d; --secondary-color: #c44569; --accent-color: #ffb6c1; --border-color: #ff6b9d; --shadow: 0 8px 32px rgba(255,107,157,0.3); }
+        [data-theme="purple"] { --bg-gradient-1: #f3e8ff; --bg-gradient-2: #e6d5ff; --primary-color: #9b59b6; --secondary-color: #8e44ad; --accent-color: #d4a5ff; --border-color: #9b59b6; --shadow: 0 8px 32px rgba(155,89,182,0.3); }
+        [data-theme="blue"] { --bg-gradient-1: #e8f4fd; --bg-gradient-2: #d4e8fc; --primary-color: #3498db; --secondary-color: #2980b9; --accent-color: #74b9ff; --border-color: #3498db; --shadow: 0 8px 32px rgba(52,152,219,0.3); }
+        [data-theme="green"] { --bg-gradient-1: #e8f8f5; --bg-gradient-2: #d1f2eb; --primary-color: #1abc9c; --secondary-color: #16a085; --accent-color: #76d7c4; --border-color: #1abc9c; --shadow: 0 8px 32px rgba(26,188,156,0.3); }
+        [data-theme="red"] { --bg-gradient-1: #fdedec; --bg-gradient-2: #fadbd8; --primary-color: #e74c3c; --secondary-color: #c0392b; --accent-color: #f1948a; --border-color: #e74c3c; --shadow: 0 8px 32px rgba(231,76,60,0.3); }
+        [data-mode="dark"] { --bg-gradient-1: #1a1a2e; --bg-gradient-2: #16213e; --text-color: #fff; --card-bg: rgba(255,255,255,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; min-height: 100vh; background: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2)); color: var(--text-color); padding: 20px; transition: all 0.3s ease; overflow-x: hidden; }
+        body::before { content: '💕'; position: fixed; top: 10%; left: 5%; font-size: 60px; opacity: 0.1; pointer-events: none; animation: float 6s ease-in-out infinite; }
+        body::after { content: '💖'; position: fixed; bottom: 10%; right: 5%; font-size: 60px; opacity: 0.1; pointer-events: none; animation: float 6s ease-in-out infinite reverse; }
+        @keyframes float { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(10deg); } }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .back-btn { display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; text-decoration: none; border-radius: 25px; font-weight: bold; margin-bottom: 20px; transition: all 0.3s ease; box-shadow: var(--shadow); }
+        .back-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(255,140,66,0.4); }
+        h1 { text-align: center; font-size: 2.5em; margin-bottom: 10px; color: var(--primary-color); text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        .subtitle { text-align: center; font-size: 1.2em; margin-bottom: 20px; opacity: 0.8; }
+        .theme-panel { position: fixed; top: 20px; right: 20px; background: var(--card-bg); backdrop-filter: blur(10px); padding: 15px; border-radius: 15px; box-shadow: var(--shadow); z-index: 100; }
+        .theme-btn { width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; cursor: pointer; margin: 0 5px; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .theme-btn:hover { transform: scale(1.2); }
+        .theme-btn.active { transform: scale(1.2); box-shadow: 0 0 15px currentColor; }
+        .theme-btn.orange { background: linear-gradient(135deg, #ff8c42, #ff6b35); }
+        .theme-btn.pink { background: linear-gradient(135deg, #ff6b9d, #c44569); }
+        .theme-btn.purple { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .theme-btn.blue { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .theme-btn.green { background: linear-gradient(135deg, #1abc9c, #16a085); }
+        .theme-btn.red { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .mode-toggle { width: 60px; height: 30px; background: #ddd; border-radius: 15px; position: relative; cursor: pointer; margin-top: 10px; transition: all 0.3s ease; }
+        .mode-toggle::after { content: '☀️'; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.3s ease; }
+        [data-mode="dark"] .mode-toggle { background: var(--primary-color); }
+        [data-mode="dark"] .mode-toggle::after { left: 32px; content: '🌙'; }
+        .random-theme-btn { margin-top: 10px; padding: 8px 16px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; width: 100%; }
+        .random-theme-btn:hover { transform: scale(1.05); }
+        .name-inputs { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .name-inputs input { padding: 8px 12px; border: 2px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-color); font-size: 14px; }
+        .name-inputs input:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,140,66,0.3); }
+        .game-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 20px; }
+        .player-info { background: var(--card-bg); backdrop-filter: blur(10px); padding: 15px 25px; border-radius: 15px; box-shadow: var(--shadow); text-align: center; min-width: 180px; transition: all 0.3s ease; }
+        .player-info.active { border: 3px solid var(--primary-color); transform: scale(1.05); animation: glow 1.5s ease-in-out infinite; }
+        @keyframes glow { 0%,100% { box-shadow: var(--shadow); } 50% { box-shadow: 0 0 30px rgba(255,140,66,0.6); } }
+        .player-info h2 { font-size: 1.3em; margin-bottom: 5px; }
+        .player1-info h2 { color: var(--player1-color); }
+        .player2-info h2 { color: var(--player2-color); }
+        .score-display { font-size: 2em; font-weight: bold; color: var(--primary-color); }
+        .game-canvas { background: linear-gradient(180deg, #2ecc71, #27ae60); border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); display: block; margin: 0 auto 20px; }
+        .game-message { text-align: center; font-size: 1.3em; margin-bottom: 20px; min-height: 40px; color: var(--primary-color); font-weight: bold; }
+        .controls { text-align: center; margin-bottom: 20px; }
+        .btn-group { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 15px 30px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 30px; cursor: pointer; transition: all 0.3s ease; box-shadow: var(--shadow); color: white; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(255,140,66,0.4); }
+        .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-serve { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .btn-secondary { background: linear-gradient(135deg, #95a5a6, #7f8c8d); }
+        .btn-share { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .instructions { background: var(--card-bg); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; box-shadow: var(--shadow); }
+        .instructions h3 { color: var(--primary-color); margin-bottom: 10px; text-align: center; }
+        .instructions p { margin: 5px 0; line-height: 1.6; }
+        .pause-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .pause-overlay.active { opacity: 1; pointer-events: auto; }
+        .pause-content { background: var(--card-bg); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; text-align: center; box-shadow: var(--shadow); }
+        .pause-content h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 2em; }
+        .share-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .share-modal.active { opacity: 1; pointer-events: auto; }
+        .share-content { background: var(--card-bg); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; text-align: center; box-shadow: var(--shadow); max-width: 500px; width: 90%; }
+        .share-content h2 { color: var(--primary-color); margin-bottom: 20px; }
+        #shareCanvas { border-radius: 10px; margin-bottom: 20px; max-width: 100%; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 2em; cursor: pointer; color: var(--text-color); transition: transform 0.3s ease; }
+        .close-btn:hover { transform: rotate(90deg); }
+        @media (max-width: 768px) { .theme-panel { position: static; margin-bottom: 20px; } h1 { font-size: 1.8em; } }
+    </style>
+</head>
+<body data-theme="orange" data-mode="light">
+    <div class="theme-panel">
+        <div>
+            <button class="theme-btn orange active" data-theme="orange" data-mode="light"></button>
+            <button class="theme-btn pink" data-theme="pink" data-mode="light"></button>
+            <button class="theme-btn purple" data-theme="purple" data-mode="light"></button>
+            <button class="theme-btn blue" data-theme="blue" data-mode="light"></button>
+            <button class="theme-btn green" data-theme="green" data-mode="light"></button>
+            <button class="theme-btn red" data-theme="red" data-mode="light"></button>
+        </div>
+        <div style="margin-top: 10px;">
+            <button class="theme-btn orange" data-theme="orange" data-mode="dark"></button>
+            <button class="theme-btn pink" data-theme="pink" data-mode="dark"></button>
+            <button class="theme-btn purple" data-theme="purple" data-mode="dark"></button>
+            <button class="theme-btn blue" data-theme="blue" data-mode="dark"></button>
+            <button class="theme-btn green" data-theme="green" data-mode="dark"></button>
+            <button class="theme-btn red" data-theme="red" data-mode="dark"></button>
+        </div>
+        <div class="mode-toggle" id="modeToggle"></div>
+        <button class="random-theme-btn" id="randomThemeBtn">🎲 随机主题</button>
+        <div class="name-inputs">
+            <input type="text" id="player1Name" placeholder="玩家1昵称" maxlength="10">
+            <input type="text" id="player2Name" placeholder="玩家2昵称" maxlength="10">
+        </div>
+    </div>
+
+    <div class="pause-overlay" id="pauseOverlay">
+        <div class="pause-content">
+            <h2>⏸️ 游戏暂停</h2>
+            <button class="btn btn-primary" onclick="togglePause()">▶️ 继续游戏</button>
+        </div>
+    </div>
+
+    <div class="share-modal" id="shareModal">
+        <span class="close-btn" onclick="closeShareModal()">&times;</span>
+        <div class="share-content">
+            <h2>📸 分享战绩</h2>
+            <canvas id="shareCanvas" width="400" height="300"></canvas>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="downloadShareImage()">💾 保存图片</button>
+                <button class="btn btn-secondary" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="../index.html" class="back-btn">← 返回主页</a>
+        <h1>🏸 羽毛球对战</h1>
+        <p class="subtitle">经典羽毛球游戏，快来对战吧！</p>
+
+        <div class="game-info">
+            <div class="player-info player1-info" id="player1Info">
+                <h2 id="player1NameDisplay">玩家1</h2>
+                <div class="score-display" id="player1Score">0</div>
+            </div>
+            <div class="player-info player2-info" id="player2Info">
+                <h2 id="player2NameDisplay">玩家2</h2>
+                <div class="score-display" id="player2Score">0</div>
+            </div>
+        </div>
+
+        <div class="game-message" id="gameMessage">点击"开始游戏"开始对战！</div>
+
+        <canvas class="game-canvas" id="gameCanvas" width="800" height="500"></canvas>
+
+        <div class="controls">
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn" onclick="startGame()">🎮 开始游戏</button>
+                <button class="btn btn-serve" id="serveBtn" onclick="serve()" disabled>🎾 发球</button>
+                <button class="btn btn-secondary" id="pauseBtn" onclick="togglePause()">⏸️ 暂停</button>
+                <button class="btn btn-share" id="shareBtn" onclick="showShareModal()">📸 分享战绩</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>🎯 游戏规则</h3>
+            <p><strong>目标：</strong>将羽毛球击打到对方场地，让对方接不到</p>
+            <p><strong>操作：</strong></p>
+            <ul>
+                <li><strong>玩家1：</strong> <span style="background: var(--primary-color); color: white; padding: 3px 10px; border-radius: 5px; margin: 0 3px;">W</span> 向上，<span style="background: var(--primary-color); color: white; padding: 3px 10px; border-radius: 5px; margin: 0 3px;">S</span> 向下</li>
+                <li><strong>玩家2：</strong> <span style="background: var(--primary-color); color: white; padding: 3px 10px; border-radius: 5px; margin: 0 3px;">↑</span> 向上，<span style="background: var(--primary-color); color: white; padding: 3px 10px; border-radius: 5px; margin: 0 3px;">↓</span> 向下</li>
+                <li><strong>发球：</strong>点击"发球"按钮或按空格键</li>
+            </ul>
+            <p><strong>获胜条件：</strong>先获得11分的玩家获胜</p>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let player1Name = urlParams.get('p1') || '玩家1';
+        let player2Name = urlParams.get('p2') || '玩家2';
+        document.getElementById('player1Name').value = player1Name;
+        document.getElementById('player2Name').value = player2Name;
+        document.getElementById('player1NameDisplay').textContent = player1Name;
+        document.getElementById('player2NameDisplay').textContent = player2Name;
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const CANVAS_WIDTH = 800;
+        const CANVAS_HEIGHT = 500;
+        const NET_WIDTH = 6;
+        
+        let player1Paddle = { x: 30, y: CANVAS_HEIGHT/2, width: 15, height: 80 };
+        let player2Paddle = { x: CANVAS_WIDTH - 45, y: CANVAS_HEIGHT/2, width: 15, height: 80 };
+        let shuttlecock = { x: CANVAS_WIDTH/2, y: CANVAS_HEIGHT/2, radius: 10, dx: 5, dy: 2 };
+        
+        let player1Score = 0, player2Score = 0;
+        let gameRunning = false, gamePaused = false;
+        let isServing = false;
+        let winner = null;
+        let animationId = null;
+        
+        const body = document.body;
+        const colorThemeBtns = document.querySelectorAll('.theme-btn');
+        const modeToggle = document.getElementById('modeToggle');
+        const randomThemeBtn = document.getElementById('randomThemeBtn');
+        let appliedTheme = localStorage.getItem('theme') || 'orange';
+        let appliedMode = localStorage.getItem('mode') || 'light';
+
+        function applyTheme(theme, mode) {
+            body.setAttribute('data-theme', theme);
+            body.setAttribute('data-mode', mode);
+            localStorage.setItem('theme', theme);
+            localStorage.setItem('mode', mode);
+            colorThemeBtns.forEach(btn => { btn.classList.remove('active'); if (btn.dataset.theme === theme && btn.dataset.mode === mode) btn.classList.add('active'); });
+        }
+
+        function previewTheme(theme, mode) { body.setAttribute('data-theme', theme); body.setAttribute('data-mode', mode); }
+        function restoreTheme() { body.setAttribute('data-theme', appliedTheme); body.setAttribute('data-mode', appliedMode); }
+
+        applyTheme(appliedTheme, appliedMode);
+
+        colorThemeBtns.forEach(btn => {
+            btn.addEventListener('mouseenter', () => previewTheme(btn.dataset.theme, btn.dataset.mode));
+            btn.addEventListener('mouseleave', restoreTheme);
+            btn.addEventListener('click', () => { appliedTheme = btn.dataset.theme; appliedMode = btn.dataset.mode; applyTheme(appliedTheme, appliedMode); });
+        });
+
+        modeToggle.addEventListener('click', () => { appliedMode = appliedMode === 'light' ? 'dark' : 'light'; applyTheme(appliedTheme, appliedMode); });
+        randomThemeBtn.addEventListener('click', () => {
+            const themes = ['orange','pink','purple','blue','green','red'];
+            const modes = ['light','dark'];
+            appliedTheme = themes[Math.floor(Math.random()*themes.length)];
+            appliedMode = modes[Math.floor(Math.random()*modes.length)];
+            applyTheme(appliedTheme, appliedMode);
+        });
+
+        document.getElementById('player1Name').addEventListener('input', updateNames);
+        document.getElementById('player2Name').addEventListener('input', updateNames);
+
+        function updateNames() {
+            player1Name = document.getElementById('player1Name').value || '玩家1';
+            player2Name = document.getElementById('player2Name').value || '玩家2';
+            document.getElementById('player1NameDisplay').textContent = player1Name;
+            document.getElementById('player2NameDisplay').textContent = player2Name;
+        }
+
+        function drawCourt() {
+            ctx.fillStyle = '#27ae60';
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < CANVAS_HEIGHT; i += 30) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(CANVAS_WIDTH, i);
+                ctx.stroke();
+            }
+            
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(CANVAS_WIDTH/2 - NET_WIDTH/2, 0, NET_WIDTH, CANVAS_HEIGHT);
+            
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(5, 5, CANVAS_WIDTH - 10, CANVAS_HEIGHT - 10);
+        }
+
+        function drawPaddles() {
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillRect(player1Paddle.x, player1Paddle.y - player1Paddle.height/2, player1Paddle.width, player1Paddle.height);
+            
+            ctx.fillStyle = '#4ecdc4';
+            ctx.fillRect(player2Paddle.x, player2Paddle.y - player2Paddle.height/2, player2Paddle.width, player2Paddle.height);
+        }
+
+        function drawShuttlecock() {
+            ctx.beginPath();
+            ctx.arc(shuttlecock.x, shuttlecock.y, shuttlecock.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(shuttlecock.x, shuttlecock.y - shuttlecock.radius - 5);
+            ctx.lineTo(shuttlecock.x, shuttlecock.y - shuttlecock.radius - 15);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(shuttlecock.x - 3, shuttlecock.y - shuttlecock.radius - 8);
+            ctx.lineTo(shuttlecock.x - 8, shuttlecock.y - shuttlecock.radius - 12);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(shuttlecock.x + 3, shuttlecock.y - shuttlecock.radius - 8);
+            ctx.lineTo(shuttlecock.x + 8, shuttlecock.y - shuttlecock.radius - 12);
+            ctx.stroke();
+        }
+
+        function movePaddles() {
+            if (keys['w'] || keys['W']) {
+                player1Paddle.y = Math.max(player1Paddle.height/2, player1Paddle.y - 8);
+            }
+            if (keys['s'] || keys['S']) {
+                player1Paddle.y = Math.min(CANVAS_HEIGHT - player1Paddle.height/2, player1Paddle.y + 8);
+            }
+            if (keys['ArrowUp']) {
+                player2Paddle.y = Math.max(player2Paddle.height/2, player2Paddle.y - 8);
+            }
+            if (keys['ArrowDown']) {
+                player2Paddle.y = Math.min(CANVAS_HEIGHT - player2Paddle.height/2, player2Paddle.y + 8);
+            }
+        }
+
+        function moveShuttlecock() {
+            shuttlecock.x += shuttlecock.dx;
+            shuttlecock.y += shuttlecock.dy;
+
+            if (shuttlecock.y - shuttlecock.radius <= 0 || shuttlecock.y + shuttlecock.radius >= CANVAS_HEIGHT) {
+                shuttlecock.dy = -shuttlecock.dy;
+            }
+
+            if (shuttlecock.x - shuttlecock.radius <= player1Paddle.x + player1Paddle.width &&
+                shuttlecock.x + shuttlecock.radius >= player1Paddle.x &&
+                shuttlecock.y >= player1Paddle.y - player1Paddle.height/2 &&
+                shuttlecock.y <= player1Paddle.y + player1Paddle.height/2) {
+                shuttlecock.dx = Math.abs(shuttlecock.dx) * 1.05;
+                const hitPos = (shuttlecock.y - player1Paddle.y) / (player1Paddle.height/2);
+                shuttlecock.dy = hitPos * 5;
+            }
+
+            if (shuttlecock.x + shuttlecock.radius >= player2Paddle.x &&
+                shuttlecock.x - shuttlecock.radius <= player2Paddle.x + player2Paddle.width &&
+                shuttlecock.y >= player2Paddle.y - player2Paddle.height/2 &&
+                shuttlecock.y <= player2Paddle.y + player2Paddle.height/2) {
+                shuttlecock.dx = -Math.abs(shuttlecock.dx) * 1.05;
+                const hitPos = (shuttlecock.y - player2Paddle.y) / (player2Paddle.height/2);
+                shuttlecock.dy = hitPos * 5;
+            }
+
+            if (shuttlecock.x - shuttlecock.radius <= 0) {
+                player2Score++;
+                resetShuttlecock(1);
+                checkWin();
+            }
+            if (shuttlecock.x + shuttlecock.radius >= CANVAS_WIDTH) {
+                player1Score++;
+                resetShuttlecock(0);
+                checkWin();
+            }
+        }
+
+        function resetShuttlecock(server) {
+            shuttlecock.x = CANVAS_WIDTH/2;
+            shuttlecock.y = CANVAS_HEIGHT/2;
+            shuttlecock.dx = server === 0 ? 5 : -5;
+            shuttlecock.dy = (Math.random() - 0.5) * 6;
+            isServing = true;
+            document.getElementById('serveBtn').disabled = false;
+        }
+
+        function serve() {
+            if (!isServing || !gameRunning) return;
+            isServing = false;
+            document.getElementById('serveBtn').disabled = true;
+        }
+
+        function checkWin() {
+            document.getElementById('player1Score').textContent = player1Score;
+            document.getElementById('player2Score').textContent = player2Score;
+
+            if (player1Score >= 11 || player2Score >= 11) {
+                gameRunning = false;
+                winner = player1Score > player2Score ? 0 : 1;
+                const winnerName = winner === 0 ? player1Name : player2Name;
+                updateMessage(`🎉 ${winnerName} 获胜！`);
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('serveBtn').disabled = true;
+                if (animationId) cancelAnimationFrame(animationId);
+            } else {
+                updateMessage(`${player1Name}: ${player1Score} - ${player2Score}: ${player2Name}`);
+            }
+        }
+
+        function gameLoop() {
+            if (!gameRunning || gamePaused) {
+                animationId = requestAnimationFrame(gameLoop);
+                return;
+            }
+
+            if (!isServing) {
+                movePaddles();
+                moveShuttlecock();
+            }
+
+            drawCourt();
+            drawPaddles();
+            drawShuttlecock();
+
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function startGame() {
+            player1Score = 0; player2Score = 0;
+            player1Paddle.y = CANVAS_HEIGHT/2;
+            player2Paddle.y = CANVAS_HEIGHT/2;
+            winner = null;
+            
+            document.getElementById('player1Score').textContent = '0';
+            document.getElementById('player2Score').textContent = '0';
+            document.getElementById('startBtn').disabled = true;
+            
+            resetShuttlecock(Math.floor(Math.random() * 2));
+            gameRunning = true;
+            gamePaused = false;
+            
+            updateMessage('准备发球！');
+            gameLoop();
+        }
+
+        function updateMessage(msg) {
+            document.getElementById('gameMessage').textContent = msg;
+        }
+
+        function togglePause() {
+            if (!gameRunning && !gamePaused) return;
+            gamePaused = !gamePaused;
+            const overlay = document.getElementById('pauseOverlay');
+            const btn = document.getElementById('pauseBtn');
+            if (gamePaused) { overlay.classList.add('active'); btn.textContent = '▶️ 继续'; }
+            else { overlay.classList.remove('active'); btn.textContent = '⏸️ 暂停'; }
+        }
+
+        function showShareModal() {
+            document.getElementById('shareModal').classList.add('active');
+            generateShareImage();
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+
+        function generateShareImage() {
+            const canvas = document.getElementById('shareCanvas');
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+            gradient.addColorStop(0,'#fff5eb'); gradient.addColorStop(1,'#ffe4c4');
+            ctx.fillStyle = gradient; ctx.fillRect(0,0,canvas.width,canvas.height);
+            
+            ctx.fillStyle = '#ff8c42'; ctx.font = 'bold 28px Arial'; ctx.textAlign = 'center';
+            ctx.fillText('🏸 羽毛球对战', canvas.width/2, 50);
+            
+            ctx.fillStyle = '#333'; ctx.font = '18px Arial';
+            ctx.fillText(`${player1Name} vs ${player2Name}`, canvas.width/2, 90);
+            
+            ctx.fillStyle = '#ff6b6b'; ctx.font = 'bold 32px Arial';
+            ctx.fillText(player1Score, canvas.width/2 - 50, 160);
+            
+            ctx.fillStyle = '#333'; ctx.font = 'bold 32px Arial';
+            ctx.fillText(':', canvas.width/2, 160);
+            
+            ctx.fillStyle = '#4ecdc4';
+            ctx.fillText(player2Score, canvas.width/2 + 50, 160);
+            
+            let resultText = winner === 0 ? `🏆 ${player1Name} 获胜！` : winner === 1 ? `🏆 ${player2Name} 获胜！` : gameRunning ? '游戏进行中...' : '等待开始...';
+            ctx.fillStyle = '#ff8c42'; ctx.font = 'bold 24px Arial';
+            ctx.fillText(resultText, canvas.width/2, 230);
+            
+            ctx.fillStyle = '#999'; ctx.font = '14px Arial';
+            ctx.fillText('情侣小游戏合集', canvas.width/2, 280);
+        }
+
+        function downloadShareImage() {
+            const canvas = document.getElementById('shareCanvas');
+            const link = document.createElement('a');
+            link.download = '羽毛球对战战绩.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        const keys = {};
+        document.addEventListener('keydown', e => { keys[e.key] = true; if (e.code === 'Space' && isServing && gameRunning && !gamePaused) serve(); });
+        document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+        drawCourt();
+        drawPaddles();
+        drawShuttlecock();
+    </script>
+</body>
+</html>

@@ -1,9 +1,9 @@
 # 🎮 双人小游戏合集 - Couple Mini Games
 
-> 专为情侣和朋友设计的 14 款双人本地对战小游戏，纯 HTML/CSS/JavaScript 实现，无需安装，打开即玩！
+> 专为情侣和朋友设计的 20 款双人本地对战小游戏，纯 HTML/CSS/JavaScript 实现，无需安装，打开即玩！
 
 ![GitHub](https://img.shields.io/badge/GitHub-lccuhk%2Fcouple--mini--game-blue)
-![Games](https://img.shields.io/badge/游戏数量-14款-green)
+![Games](https://img.shields.io/badge/游戏数量-20款-green)
 ![Tech](https://img.shields.io/badge/技术栈-HTML%2FCSS%2FJS-orange)
 ![Themes](https://img.shields.io/badge/主题数量-12种-purple)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
@@ -45,6 +45,17 @@
 | 12 | [飞镖对战](games/12_darts_battle.html) | 🎯 | 力量条控制投掷力度，点击选择目标，5回合制 |
 | 13 | [拼图对战](games/13_puzzle_battle.html) | 🧩 | 双人竞速拼图，3种难度可选，比拼速度和智慧 |
 | 14 | [骰子大作战](games/14_dice_battle.html) | 🎲 | 策略与运气的较量，经典"猪游戏"变体，小心掷出1！ |
+
+### 🃏 桌游派对
+
+| 序号 | 游戏 | 图标 | 描述 |
+|------|------|------|------|
+| 15 | [Uno对战](games/15_uno_battle.html) | 🃏 | 经典Uno卡牌游戏，支持特殊牌（+2、反转、跳过、变色、+4），喊UNO机制 |
+| 16 | [21点对战](games/16_blackjack_battle.html) | 🃏 | 经典Blackjack双人对战，21点规则，比拼谁更接近21点 |
+| 17 | [大富翁](games/17_monopoly_battle.html) | 🏠 | 8x4棋盘，掷骰子移动、购买地产、收取租金，20回合制 |
+| 18 | [保龄球对战](games/18_bowling_battle.html) | 🎳 | 10瓶保龄球比赛，力量条控制投球力度，全中和补中计分 |
+| 19 | [羽毛球对战](games/19_badminton_battle.html) | 🏸 | Canvas绘制羽毛球场地，发球机制，11分制获胜 |
+| 20 | [你画我猜](games/20_pictionary_battle.html) | 🎨 | Canvas绘图功能，60秒限时猜词，5轮制对战 |
 
 ---
 
@@ -155,6 +166,42 @@ npx serve .
 | 玩家1 | `空格` | `Q` |
 | 玩家2 | `回车` | `P` |
 
+#### 🃏 Uno对战
+| 玩家 | 出牌 | 喊UNO |
+|------|------|-------|
+| 玩家1 | 鼠标点击手牌 | `U` |
+| 玩家2 | 鼠标点击手牌 | `I` |
+
+#### 🃏 21点对战
+| 玩家 | 要牌 | 停牌 |
+|------|------|------|
+| 玩家1 | `H` | `S` |
+| 玩家2 | `↑` | `↓` |
+
+#### 🏠 大富翁
+| 玩家 | 掷骰子 | 购买 |
+|------|--------|------|
+| 玩家1 | `空格` | `B` |
+| 玩家2 | `空格` | `B` |
+
+#### 🎳 保龄球对战
+| 玩家 | 投球 |
+|------|------|
+| 玩家1 | `空格` |
+| 玩家2 | `回车` |
+
+#### 🏸 羽毛球对战
+| 玩家 | 向上 | 向下 | 发球/击球 |
+|------|------|------|----------|
+| 玩家1 | `W` | `S` | `空格` |
+| 玩家2 | `↑` | `↓` | `回车` |
+
+#### 🎨 你画我猜
+| 玩家 | 操作 |
+|------|------|
+| 玩家1 | 鼠标绘图 |
+| 玩家2 | 键盘输入答案 |
+
 #### ⏸️ 通用快捷键
 | 功能 | 按键 |
 |------|------|
@@ -229,7 +276,13 @@ couple-mini-game/
     ├── 11_2048_battle.html      # 🔢 2048对战
     ├── 12_darts_battle.html     # 🎯 飞镖对战
     ├── 13_puzzle_battle.html    # 🧩 拼图对战
-    └── 14_dice_battle.html      # 🎲 骰子大作战
+    ├── 14_dice_battle.html      # 🎲 骰子大作战
+    ├── 15_uno_battle.html       # 🃏 Uno对战
+    ├── 16_blackjack_battle.html # 🃏 21点对战
+    ├── 17_monopoly_battle.html  # 🏠 大富翁
+    ├── 18_bowling_battle.html   # 🎳 保龄球对战
+    ├── 19_badminton_battle.html # 🏸 羽毛球对战
+    └── 20_pictionary_battle.html # 🎨 你画我猜
 ```
 
 ---
