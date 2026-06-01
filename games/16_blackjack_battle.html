@@ -68,7 +68,7 @@
         }
 
         [data-theme="green"] {
-            --bg-gradient-1: #e8f8f5;
+            --bg-gradient-1: #e8f5f5;
             --bg-gradient-2: #d1f2eb;
             --primary-color: #1abc9c;
             --secondary-color: #16a085;
@@ -396,82 +396,122 @@
         .cards-container {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
             flex-wrap: wrap;
-            min-height: 120px;
+            min-height: 150px;
             padding: 20px;
             background: rgba(0, 0, 0, 0.1);
             border-radius: 15px;
         }
 
         .playing-card {
-            width: 80px;
-            height: 115px;
-            background: white;
-            border-radius: 8px;
+            width: 90px;
+            height: 130px;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             padding: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
-            animation: dealCard 0.3s ease-out;
+            animation: dealCard 0.4s ease-out;
             position: relative;
+            border: 1px solid #ddd;
         }
 
         @keyframes dealCard {
             from {
-                transform: translateY(-100px) rotate(-10deg);
+                transform: translateY(-150px) rotate(-15deg) scale(0.8);
                 opacity: 0;
             }
             to {
-                transform: translateY(0) rotate(0);
+                transform: translateY(0) rotate(0deg) scale(1);
                 opacity: 1;
             }
         }
 
         .playing-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
         }
 
         .playing-card.red {
-            color: #e74c3c;
+            color: #d00000;
         }
 
         .playing-card.black {
-            color: #2c3e50;
+            color: #1a1a1a;
         }
 
-        .card-value {
-            font-size: 1.5em;
-            font-weight: bold;
+        .card-corner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
         }
 
-        .card-suit {
-            font-size: 1.8em;
-            text-align: center;
-        }
-
-        .card-value-bottom {
-            font-size: 1.5em;
-            font-weight: bold;
+        .card-corner-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
             transform: rotate(180deg);
             align-self: flex-end;
         }
 
+        .card-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .card-suit-small {
+            font-size: 1em;
+            line-height: 1;
+        }
+
+        .card-suit-large {
+            font-size: 3em;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .card-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+        }
+
         .card-back {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 50%, #e74c3c 100%);
             border: 3px solid white;
         }
 
         .card-back::before {
-            content: '🎴';
+            content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 2em;
+            width: 70%;
+            height: 80%;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+        }
+
+        .card-back::after {
+            content: '🃏';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5em;
         }
 
         .status-badge {
@@ -730,21 +770,29 @@
             }
 
             .playing-card {
-                width: 60px;
-                height: 85px;
+                width: 65px;
+                height: 95px;
                 padding: 5px;
             }
 
-            .card-value, .card-value-bottom {
-                font-size: 1.2em;
+            .card-value {
+                font-size: 1.1em;
             }
 
-            .card-suit {
-                font-size: 1.4em;
+            .card-suit-small {
+                font-size: 0.8em;
+            }
+
+            .card-suit-large {
+                font-size: 2em;
             }
 
             .game-table {
                 padding: 20px;
+            }
+
+            .cards-container {
+                gap: 10px;
             }
         }
     </style>
@@ -1137,21 +1185,41 @@
                     const color = getCardColor(card.suit);
                     cardEl.className = `playing-card ${color}`;
                     
+                    // 左上角
+                    const cornerTop = document.createElement('div');
+                    cornerTop.className = 'card-corner';
                     const valueTop = document.createElement('div');
                     valueTop.className = 'card-value';
                     valueTop.textContent = card.value;
+                    const suitTop = document.createElement('div');
+                    suitTop.className = 'card-suit-small';
+                    suitTop.textContent = card.suit;
+                    cornerTop.appendChild(valueTop);
+                    cornerTop.appendChild(suitTop);
                     
-                    const suit = document.createElement('div');
-                    suit.className = 'card-suit';
-                    suit.textContent = card.suit;
+                    // 中间大花色
+                    const center = document.createElement('div');
+                    center.className = 'card-center';
+                    const suitCenter = document.createElement('div');
+                    suitCenter.className = 'card-suit-large';
+                    suitCenter.textContent = card.suit;
+                    center.appendChild(suitCenter);
                     
+                    // 右下角（旋转180度）
+                    const cornerBottom = document.createElement('div');
+                    cornerBottom.className = 'card-corner-bottom';
                     const valueBottom = document.createElement('div');
-                    valueBottom.className = 'card-value-bottom';
+                    valueBottom.className = 'card-value';
                     valueBottom.textContent = card.value;
+                    const suitBottom = document.createElement('div');
+                    suitBottom.className = 'card-suit-small';
+                    suitBottom.textContent = card.suit;
+                    cornerBottom.appendChild(valueBottom);
+                    cornerBottom.appendChild(suitBottom);
                     
-                    cardEl.appendChild(valueTop);
-                    cardEl.appendChild(suit);
-                    cardEl.appendChild(valueBottom);
+                    cardEl.appendChild(cornerTop);
+                    cardEl.appendChild(center);
+                    cardEl.appendChild(cornerBottom);
                 }
                 
                 container.appendChild(cardEl);
