@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推箱子对战</title>
+    <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --bg-color: #f8f9fa;
+            --text-color: #2d3436;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+        }
+        
+        [data-theme="orange"] {
+            --primary-color: #ff9f43;
+            --secondary-color: #fd79a8;
+        }
+        
+        [data-theme="purple"] {
+            --primary-color: #a29bfe;
+            --secondary-color: #fd79a8;
+        }
+        
+        [data-theme="green"] {
+            --primary-color: #00b894;
+            --secondary-color: #0984e3;
+        }
+        
+        [data-theme="blue"] {
+            --primary-color: #74b9ff;
+            --secondary-color: #00cec9;
+        }
+        
+        [data-theme="pink"] {
+            --primary-color: #fd79a8;
+            --secondary-color: #a29bfe;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #2d3436;
+            --text-color: #ffffff;
+            --card-bg: #343a40;
+            --border-color: #495057;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .theme-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .theme-btn:nth-child(1) { background: linear-gradient(135deg, #ff6b6b, #4ecdc4); }
+        .theme-btn:nth-child(2) { background: linear-gradient(135deg, #ff9f43, #fd79a8); }
+        .theme-btn:nth-child(3) { background: linear-gradient(135deg, #a29bfe, #fd79a8); }
+        .theme-btn:nth-child(4) { background: linear-gradient(135deg, #00b894, #0984e3); }
+        .theme-btn:nth-child(5) { background: linear-gradient(135deg, #74b9ff, #00cec9); }
+        .theme-btn:nth-child(6) { background: linear-gradient(135deg, #fd79a8, #a29bfe); }
+        
+        .dark-toggle {
+            padding: 10px 20px;
+            border: 2px solid var(--primary-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dark-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .player-panel {
+            text-align: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            min-width: 150px;
+        }
+
+        .player-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .player-score {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .moves-count {
+            font-size: 16px;
+            margin-top: 10px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .game-area {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .game-board {
+            display: grid;
+            gap: 2px;
+            background: var(--border-color);
+            padding: 8px;
+            border-radius: 10px;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            border-radius: 6px;
+        }
+
+        .cell.wall {
+            background: #636e72;
+        }
+
+        .cell.floor {
+            background: #dfe6e9;
+        }
+
+        .cell.target {
+            background: #fdcb6e;
+        }
+
+        .cell.player1 {
+            background: var(--primary-color);
+            animation: pulse 1s infinite;
+        }
+
+        .cell.player2 {
+            background: var(--secondary-color);
+            animation: pulse 1s infinite;
+        }
+
+        .cell.box {
+            background: #2d3436;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3);
+        }
+
+        .cell.boxOnTarget {
+            background: #00b894;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .turn-indicator {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .pause-btn, .share-btn {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .game-over-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+        }
+
+        .game-over-text {
+            font-size: 48px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .winner-text {
+            font-size: 28px;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .nickname-input {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            width: 100%;
+            text-align: center;
+        }
+
+        .random-theme-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .level-selector {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .level-btn {
+            padding: 8px 16px;
+            margin: 4px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .level-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .level-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">🎮 推箱子对战</h1>
+        <div class="theme-controls">
+            <button class="theme-btn" title="红色主题"></button>
+            <button class="theme-btn" title="橙色主题"></button>
+            <button class="theme-btn" title="紫色主题"></button>
+            <button class="theme-btn" title="绿色主题"></button>
+            <button class="theme-btn" title="蓝色主题"></button>
+            <button class="theme-btn" title="粉色主题"></button>
+            <button class="random-theme-btn" title="随机主题">🎲</button>
+            <button class="dark-toggle">🌙</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="player-panel">
+            <input type="text" class="nickname-input" id="player1Name" value="玩家1" maxlength="10">
+            <div class="player-name" id="player1">玩家1</div>
+            <div class="player-score" id="score1">0</div>
+            <div class="moves-count">步数: <span id="moves1">0</span></div>
+        </div>
+
+        <div class="game-area">
+            <div class="level-selector">
+                <button class="level-btn active" data-level="0">关卡1</button>
+                <button class="level-btn" data-level="1">关卡2</button>
+                <button class="level-btn" data-level="2">关卡3</button>
+            </div>
+            
+            <div class="game-board" id="gameBoard"></div>
+            <div class="turn-indicator" id="turnIndicator">玩家1 回合</div>
+            
+            <div class="controls">
+                <button class="control-btn start-btn" id="startBtn">开始游戏</button>
+                <button class="control-btn pause-btn" id="pauseBtn">⏸ 暂停</button>
+                <button class="control-btn share-btn" id="shareBtn">📤 分享战绩</button>
+            </div>
+            
+            <div class="game-over-overlay hidden" id="gameOverOverlay">
+                <div class="game-over-text">游戏结束!</div>
+                <div class="winner-text" id="winnerText"></div>
+                <button class="control-btn start-btn" id="restartBtn">再玩一次</button>
+            </div>
+        </div>
+
+        <div class="player-panel">
+            <input type="text" class="nickname-input" id="player2Name" value="玩家2" maxlength="10">
+            <div class="player-name" id="player2">玩家2</div>
+            <div class="player-score" id="score2">0</div>
+            <div class="moves-count">步数: <span id="moves2">0</span></div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <p>🎯 玩家1: ↑ ↓ ← → 移动 | 玩家2: W A S D 移动</p>
+        <p>📦 将箱子推到目标位置得分</p>
+        <p>⭐ 箱子在目标位置上显示绿色</p>
+        <p>⏸ ESC 暂停游戏</p>
+    </div>
+
+    <script>
+        const themes = ['default', 'orange', 'purple', 'green', 'blue', 'pink'];
+        let currentTheme = 0;
+        let isDarkMode = false;
+
+        document.querySelectorAll('.theme-btn').forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                currentTheme = index;
+                document.body.setAttribute('data-theme', themes[index]);
+            });
+        });
+
+        document.querySelector('.random-theme-btn').addEventListener('click', () => {
+            currentTheme = Math.floor(Math.random() * themes.length);
+            document.body.setAttribute('data-theme', themes[currentTheme]);
+        });
+
+        document.querySelector('.dark-toggle').addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+                document.body.setAttribute('data-theme', 'dark');
+            } else {
+                document.body.setAttribute('data-theme', themes[currentTheme]);
+            }
+        });
+
+        const levels = [
+            [
+                'WWWWWW',
+                'W    W',
+                'W P1 W',
+                'W B T W',
+                'W P2 W',
+                'WWWWWW'
+            ],
+            [
+                'WWWWWWW',
+                'W     W',
+                'W P1  W',
+                'W BBT W',
+                'W  T  W',
+                'W P2  W',
+                'WWWWWWW'
+            ],
+            [
+                'WWWWWWWW',
+                'W      W',
+                'W P1   W',
+                'W BB   W',
+                'W TT   W',
+                'W B    W',
+                'W P2   W',
+                'WWWWWWWW'
+            ]
+        ];
+
+        let currentLevel = 0;
+        let board = [];
+        let player1Pos = { row: 0, col: 0 };
+        let player2Pos = { row: 0, col: 0 };
+        let currentPlayer = 1;
+        let scores = [0, 0];
+        let moves = [0, 0];
+        let isGameRunning = false;
+        let isPaused = false;
+
+        function loadLevel(levelIndex) {
+            currentLevel = levelIndex;
+            const level = levels[levelIndex];
+            board = [];
+            
+            for (let row = 0; row < level.length; row++) {
+                board[row] = [];
+                for (let col = 0; col < level[row].length; col++) {
+                    const char = level[row][col];
+                    if (char === 'W') board[row][col] = 'wall';
+                    else if (char === ' ') board[row][col] = 'floor';
+                    else if (char === 'T') board[row][col] = 'target';
+                    else if (char === 'B') board[row][col] = 'box';
+                    else if (char === 'P1') {
+                        board[row][col] = 'floor';
+                        player1Pos = { row, col };
+                    } else if (char === 'P2') {
+                        board[row][col] = 'floor';
+                        player2Pos = { row, col };
+                    }
+                }
+            }
+            renderBoard();
+        }
+
+        function renderBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.style.gridTemplateColumns = `repeat(${board[0].length}, 1fr)`;
+            gameBoard.innerHTML = '';
+            
+            for (let row = 0; row < board.length; row++) {
+                for (let col = 0; col < board[row].length; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = `cell ${board[row][col]}`;
+                    
+                    if (player1Pos.row === row && player1Pos.col === col) {
+                        cell.classList.add('player1');
+                        cell.textContent = '👤';
+                    } else if (player2Pos.row === row && player2Pos.col === col) {
+                        cell.classList.add('player2');
+                        cell.textContent = '👤';
+                    } else if (board[row][col] === 'box') {
+                        cell.textContent = '📦';
+                    } else if (board[row][col] === 'boxOnTarget') {
+                        cell.textContent = '📦';
+                    } else if (board[row][col] === 'target') {
+                        cell.textContent = '⭐';
+                    } else if (board[row][col] === 'wall') {
+                        cell.textContent = '🧱';
+                    }
+                    
+                    gameBoard.appendChild(cell);
+                }
+            }
+        }
+
+        function movePlayer(player, direction) {
+            const pos = player === 1 ? player1Pos : player2Pos;
+            let newRow = pos.row;
+            let newCol = pos.col;
+            
+            switch (direction) {
+                case 'up': newRow--; break;
+                case 'down': newRow++; break;
+                case 'left': newCol--; break;
+                case 'right': newCol++; break;
+            }
+            
+            if (isValidMove(newRow, newCol)) {
+                if (board[newRow][newCol] === 'box' || board[newRow][newCol] === 'boxOnTarget') {
+                    const boxNewRow = newRow + (newRow - pos.row);
+                    const boxNewCol = newCol + (newCol - pos.col);
+                    
+                    if (canMoveBox(boxNewRow, boxNewCol)) {
+                        moveBox(newRow, newCol, boxNewRow, boxNewCol);
+                        updatePlayerPos(player, newRow, newCol);
+                        moves[player - 1]++;
+                        updateMovesDisplay();
+                        checkWin();
+                        switchPlayer();
+                    }
+                } else {
+                    updatePlayerPos(player, newRow, newCol);
+                    moves[player - 1]++;
+                    updateMovesDisplay();
+                    switchPlayer();
+                }
+            }
+        }
+
+        function isValidMove(row, col) {
+            if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) return false;
+            return board[row][col] !== 'wall';
+        }
+
+        function canMoveBox(row, col) {
+            if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) return false;
+            if (board[row][col] === 'wall' || board[row][col] === 'box' || board[row][col] === 'boxOnTarget') return false;
+            if ((row === player1Pos.row && col === player1Pos.col) || 
+                (row === player2Pos.row && col === player2Pos.col)) return false;
+            return true;
+        }
+
+        function moveBox(fromRow, fromCol, toRow, toCol) {
+            const wasOnTarget = board[fromRow][fromCol] === 'boxOnTarget';
+            const isOnTarget = board[toRow][toCol] === 'target';
+            
+            board[fromRow][fromCol] = wasOnTarget ? 'target' : 'floor';
+            board[toRow][toCol] = isOnTarget ? 'boxOnTarget' : 'box';
+            
+            if (isOnTarget) {
+                scores[currentPlayer - 1] += 10;
+                updateScoreDisplay();
+            }
+            
+            renderBoard();
+        }
+
+        function updatePlayerPos(player, row, col) {
+            if (player === 1) {
+                player1Pos = { row, col };
+            } else {
+                player2Pos = { row, col };
+            }
+            renderBoard();
+        }
+
+        function switchPlayer() {
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            document.getElementById('turnIndicator').textContent = `${document.getElementById(`player${currentPlayer}Name`).value} 回合`;
+        }
+
+        function checkWin() {
+            let allBoxesOnTarget = true;
+            let targetCount = 0;
+            let boxOnTargetCount = 0;
+            
+            for (let row = 0; row < board.length; row++) {
+                for (let col = 0; col < board[row].length; col++) {
+                    if (board[row][col] === 'target') {
+                        targetCount++;
+                        allBoxesOnTarget = false;
+                    } else if (board[row][col] === 'boxOnTarget') {
+                        boxOnTargetCount++;
+                    }
+                }
+            }
+            
+            if (targetCount === 0 || boxOnTargetCount === targetCount) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            isGameRunning = false;
+            showGameOver();
+        }
+
+        function showGameOver() {
+            const overlay = document.getElementById('gameOverOverlay');
+            const winnerText = document.getElementById('winnerText');
+            
+            let winner = '';
+            if (scores[0] > scores[1]) {
+                winner = document.getElementById('player1Name').value;
+            } else if (scores[1] > scores[0]) {
+                winner = document.getElementById('player2Name').value;
+            } else {
+                winner = '平局';
+            }
+            
+            winnerText.textContent = winner === '平局' ? '平局!' : `${winner} 获胜!`;
+            overlay.classList.remove('hidden');
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('score1').textContent = scores[0];
+            document.getElementById('score2').textContent = scores[1];
+        }
+
+        function updateMovesDisplay() {
+            document.getElementById('moves1').textContent = moves[0];
+            document.getElementById('moves2').textContent = moves[1];
+        }
+
+        document.querySelectorAll('.level-btn').forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                loadLevel(index);
+            });
+        });
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            isGameRunning = true;
+            isPaused = false;
+            scores = [0, 0];
+            moves = [0, 0];
+            currentPlayer = 1;
+            updateScoreDisplay();
+            updateMovesDisplay();
+            loadLevel(currentLevel);
+            document.getElementById('gameOverOverlay').classList.add('hidden');
+            document.getElementById('player1').textContent = document.getElementById('player1Name').value;
+            document.getElementById('player2').textContent = document.getElementById('player2Name').value;
+            document.getElementById('turnIndicator').textContent = `${document.getElementById('player1Name').value} 回合`;
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (isGameRunning) {
+                isPaused = !isPaused;
+                document.getElementById('pauseBtn').textContent = isPaused ? '▶ 继续' : '⏸ 暂停';
+            }
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            document.getElementById('startBtn').click();
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 400;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#2d3436';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 36px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('推箱子对战战绩', canvas.width / 2, 60);
+            
+            ctx.font = '24px Arial';
+            ctx.fillText(`${document.getElementById('player1Name').value}: ${scores[0]} 分 (${moves[0]}步)`, 150, 150);
+            ctx.fillText(`${document.getElementById('player2Name').value}: ${scores[1]} 分 (${moves[1]}步)`, 450, 150);
+            
+            let result = '';
+            if (scores[0] > scores[1]) {
+                result = `${document.getElementById('player1Name').value} 获胜!`;
+            } else if (scores[1] > scores[0]) {
+                result = `${document.getElementById('player2Name').value} 获胜!`;
+            } else {
+                result = '平局!';
+            }
+            ctx.fillStyle = '#ff6b6b';
+            ctx.font = 'bold 30px Arial';
+            ctx.fillText(result, canvas.width / 2, 280);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '18px Arial';
+            ctx.fillText('🎮 couple-mini-game', canvas.width / 2, 350);
+            
+            const link = document.createElement('a');
+            link.download = 'sokoban_result.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!isGameRunning || isPaused) return;
+            
+            if (e.key === 'Escape') {
+                document.getElementById('pauseBtn').click();
+                return;
+            }
+            
+            if (currentPlayer === 1) {
+                switch (e.key) {
+                    case 'ArrowUp': movePlayer(1, 'up'); break;
+                    case 'ArrowDown': movePlayer(1, 'down'); break;
+                    case 'ArrowLeft': movePlayer(1, 'left'); break;
+                    case 'ArrowRight': movePlayer(1, 'right'); break;
+                }
+            } else {
+                switch (e.key.toLowerCase()) {
+                    case 'w': movePlayer(2, 'up'); break;
+                    case 's': movePlayer(2, 'down'); break;
+                    case 'a': movePlayer(2, 'left'); break;
+                    case 'd': movePlayer(2, 'right'); break;
+                }
+            }
+        });
+
+        loadLevel(0);
+    </script>
+</body>
+</html>

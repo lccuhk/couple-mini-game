@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泡泡龙对战</title>
+    <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --bg-color: #f8f9fa;
+            --text-color: #2d3436;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+        }
+        
+        [data-theme="orange"] {
+            --primary-color: #ff9f43;
+            --secondary-color: #fd79a8;
+        }
+        
+        [data-theme="purple"] {
+            --primary-color: #a29bfe;
+            --secondary-color: #fd79a8;
+        }
+        
+        [data-theme="green"] {
+            --primary-color: #00b894;
+            --secondary-color: #0984e3;
+        }
+        
+        [data-theme="blue"] {
+            --primary-color: #74b9ff;
+            --secondary-color: #00cec9;
+        }
+        
+        [data-theme="pink"] {
+            --primary-color: #fd79a8;
+            --secondary-color: #a29bfe;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #2d3436;
+            --text-color: #ffffff;
+            --card-bg: #343a40;
+            --border-color: #495057;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .theme-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .theme-btn:nth-child(1) { background: linear-gradient(135deg, #ff6b6b, #4ecdc4); }
+        .theme-btn:nth-child(2) { background: linear-gradient(135deg, #ff9f43, #fd79a8); }
+        .theme-btn:nth-child(3) { background: linear-gradient(135deg, #a29bfe, #fd79a8); }
+        .theme-btn:nth-child(4) { background: linear-gradient(135deg, #00b894, #0984e3); }
+        .theme-btn:nth-child(5) { background: linear-gradient(135deg, #74b9ff, #00cec9); }
+        .theme-btn:nth-child(6) { background: linear-gradient(135deg, #fd79a8, #a29bfe); }
+        
+        .dark-toggle {
+            padding: 10px 20px;
+            border: 2px solid var(--primary-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dark-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .player-panel {
+            text-align: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            min-width: 150px;
+        }
+
+        .player-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .player-score {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .game-area {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .game-board {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            transition: transform 0.1s;
+        }
+
+        .bubble:hover {
+            transform: scale(1.1);
+        }
+
+        .shooter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shooter-bubble {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+        }
+
+        .aim-line {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            width: 3px;
+            height: 200px;
+            background: var(--primary-color);
+            transform-origin: bottom center;
+            opacity: 0.5;
+        }
+
+        .turn-indicator {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .pause-btn, .share-btn {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .game-over-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+        }
+
+        .game-over-text {
+            font-size: 48px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .winner-text {
+            font-size: 28px;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .nickname-input {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            width: 100%;
+            text-align: center;
+        }
+
+        .random-theme-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">🎮 泡泡龙对战</h1>
+        <div class="theme-controls">
+            <button class="theme-btn" title="红色主题"></button>
+            <button class="theme-btn" title="橙色主题"></button>
+            <button class="theme-btn" title="紫色主题"></button>
+            <button class="theme-btn" title="绿色主题"></button>
+            <button class="theme-btn" title="蓝色主题"></button>
+            <button class="theme-btn" title="粉色主题"></button>
+            <button class="random-theme-btn" title="随机主题">🎲</button>
+            <button class="dark-toggle">🌙</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="player-panel">
+            <input type="text" class="nickname-input" id="player1Name" value="玩家1" maxlength="10">
+            <div class="player-name" id="player1">玩家1</div>
+            <div class="player-score" id="score1">0</div>
+        </div>
+
+        <div class="game-area">
+            <div class="game-board" id="gameBoard">
+                <canvas id="gameCanvas" width="400" height="500"></canvas>
+            </div>
+            <div class="turn-indicator" id="turnIndicator">玩家1 回合</div>
+            
+            <div class="controls">
+                <button class="control-btn start-btn" id="startBtn">开始游戏</button>
+                <button class="control-btn pause-btn" id="pauseBtn">⏸ 暂停</button>
+                <button class="control-btn share-btn" id="shareBtn">📤 分享战绩</button>
+            </div>
+            
+            <div class="game-over-overlay hidden" id="gameOverOverlay">
+                <div class="game-over-text">游戏结束!</div>
+                <div class="winner-text" id="winnerText"></div>
+                <button class="control-btn start-btn" id="restartBtn">再玩一次</button>
+            </div>
+        </div>
+
+        <div class="player-panel">
+            <input type="text" class="nickname-input" id="player2Name" value="玩家2" maxlength="10">
+            <div class="player-name" id="player2">玩家2</div>
+            <div class="player-score" id="score2">0</div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <p>🎯 玩家1: ← → 调整角度 | 空格键 发射</p>
+        <p>🎯 玩家2: A D 调整角度 | W 键 发射</p>
+        <p>⭐ 相同颜色的泡泡连成3个以上即可消除得分</p>
+        <p>⏸ ESC 暂停游戏</p>
+    </div>
+
+    <script>
+        const themes = ['default', 'orange', 'purple', 'green', 'blue', 'pink'];
+        let currentTheme = 0;
+        let isDarkMode = false;
+
+        document.querySelectorAll('.theme-btn').forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                currentTheme = index;
+                document.body.setAttribute('data-theme', themes[index]);
+            });
+        });
+
+        document.querySelector('.random-theme-btn').addEventListener('click', () => {
+            currentTheme = Math.floor(Math.random() * themes.length);
+            document.body.setAttribute('data-theme', themes[currentTheme]);
+        });
+
+        document.querySelector('.dark-toggle').addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+                document.body.setAttribute('data-theme', 'dark');
+            } else {
+                document.body.setAttribute('data-theme', themes[currentTheme]);
+            }
+        });
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const BUBBLE_RADIUS = 20;
+        const ROWS = 12;
+        const COLS = 8;
+        const BOARD_WIDTH = COLS * (BUBBLE_RADIUS * 2 + 2);
+        const BOARD_HEIGHT = ROWS * (BUBBLE_RADIUS * 2 + 2);
+        
+        const colors = ['#ff6b6b', '#4ecdc4', '#ffeaa7', '#dda0dd', '#98d8c8', '#f7dc6f', '#bb8fce'];
+        
+        let bubbles = [];
+        let currentBubble = null;
+        let currentPlayer = 1;
+        let scores = [0, 0];
+        let isGameRunning = false;
+        let isPaused = false;
+        let angle = -Math.PI / 2;
+        let gameOver = false;
+
+        function createBubble(x, y, color) {
+            return { x, y, color, attached: true };
+        }
+
+        function initBoard() {
+            bubbles = [];
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    let x = col * (BUBBLE_RADIUS * 2 + 4) + BUBBLE_RADIUS + 20;
+                    let y = row * (BUBBLE_RADIUS * 2 + 4) + BUBBLE_RADIUS + 20;
+                    if (row % 2 === 1) x += BUBBLE_RADIUS + 2;
+                    
+                    if (Math.random() > 0.3) {
+                        bubbles.push(createBubble(x, y, colors[Math.floor(Math.random() * colors.length)]));
+                    }
+                }
+            }
+            spawnNewBubble();
+        }
+
+        function spawnNewBubble() {
+            currentBubble = {
+                x: canvas.width / 2,
+                y: canvas.height - 50,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                attached: false,
+                dx: 0,
+                dy: 0
+            };
+        }
+
+        function drawBubbles() {
+            bubbles.forEach(bubble => {
+                drawBubble(bubble.x, bubble.y, bubble.color);
+            });
+            
+            if (currentBubble) {
+                drawBubble(currentBubble.x, currentBubble.y, currentBubble.color);
+            }
+        }
+
+        function drawBubble(x, y, color) {
+            ctx.beginPath();
+            ctx.arc(x, y, BUBBLE_RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(x - 5, y - 5, 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.fill();
+        }
+
+        function drawAimLine() {
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, canvas.height - 80);
+            ctx.lineTo(
+                canvas.width / 2 + Math.cos(angle) * 300,
+                canvas.height - 80 + Math.sin(angle) * 300
+            );
+            ctx.strokeStyle = 'rgba(255,0,0,0.3)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        function launchBubble() {
+            if (!currentBubble || isPaused) return;
+            
+            currentBubble.dx = Math.cos(angle) * 6;
+            currentBubble.dy = Math.sin(angle) * 6;
+            currentBubble.attached = false;
+        }
+
+        function updateBubble() {
+            if (!currentBubble || currentBubble.attached) return;
+            
+            currentBubble.x += currentBubble.dx;
+            currentBubble.y += currentBubble.dy;
+            
+            if (currentBubble.x - BUBBLE_RADIUS < 0 || currentBubble.x + BUBBLE_RADIUS > canvas.width) {
+                currentBubble.dx *= -0.8;
+                currentBubble.x = Math.max(BUBBLE_RADIUS, Math.min(canvas.width - BUBBLE_RADIUS, currentBubble.x));
+            }
+            
+            if (currentBubble.y - BUBBLE_RADIUS < 0) {
+                attachBubble();
+                return;
+            }
+            
+            for (let bubble of bubbles) {
+                if (checkCollision(currentBubble, bubble)) {
+                    attachBubble();
+                    return;
+                }
+            }
+            
+            if (currentBubble.y > canvas.height) {
+                switchPlayer();
+                spawnNewBubble();
+            }
+        }
+
+        function checkCollision(b1, b2) {
+            const dx = b1.x - b2.x;
+            const dy = b1.y - b2.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance < BUBBLE_RADIUS * 2;
+        }
+
+        function attachBubble() {
+            currentBubble.attached = true;
+            bubbles.push(currentBubble);
+            
+            const matched = findMatchingBubbles(currentBubble);
+            if (matched.length >= 3) {
+                scores[currentPlayer - 1] += matched.length * 10;
+                updateScoreDisplay();
+                
+                matched.forEach(b => {
+                    const idx = bubbles.findIndex(bu => bu === b);
+                    if (idx > -1) bubbles.splice(idx, 1);
+                });
+            }
+            
+            switchPlayer();
+            spawnNewBubble();
+        }
+
+        function findMatchingBubbles(start) {
+            const matched = [];
+            const visited = new Set();
+            const stack = [start];
+            
+            while (stack.length > 0) {
+                const bubble = stack.pop();
+                if (visited.has(bubble)) continue;
+                visited.add(bubble);
+                
+                if (bubble.color === start.color) {
+                    matched.push(bubble);
+                    
+                    for (let other of bubbles) {
+                        if (!visited.has(other) && checkCollision(bubble, other)) {
+                            stack.push(other);
+                        }
+                    }
+                }
+            }
+            
+            return matched;
+        }
+
+        function switchPlayer() {
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            angle = -Math.PI / 2;
+            document.getElementById('turnIndicator').textContent = `${document.getElementById(`player${currentPlayer}Name`).value} 回合`;
+            
+            checkGameOver();
+        }
+
+        function checkGameOver() {
+            const topBubble = bubbles.reduce((min, b) => Math.min(min, b.y), Infinity);
+            if (topBubble < 50) {
+                gameOver = true;
+                isGameRunning = false;
+                showGameOver();
+            }
+        }
+
+        function showGameOver() {
+            const overlay = document.getElementById('gameOverOverlay');
+            const winnerText = document.getElementById('winnerText');
+            
+            let winner = '';
+            if (scores[0] > scores[1]) {
+                winner = document.getElementById('player1Name').value;
+            } else if (scores[1] > scores[0]) {
+                winner = document.getElementById('player2Name').value;
+            } else {
+                winner = '平局';
+            }
+            
+            winnerText.textContent = winner === '平局' ? '平局!' : `${winner} 获胜!`;
+            overlay.classList.remove('hidden');
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('score1').textContent = scores[0];
+            document.getElementById('score2').textContent = scores[1];
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (isGameRunning && !isPaused) {
+                drawAimLine();
+                drawBubbles();
+                updateBubble();
+            } else if (isPaused) {
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 36px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('游戏暂停', canvas.width / 2, canvas.height / 2);
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            isGameRunning = true;
+            isPaused = false;
+            gameOver = false;
+            scores = [0, 0];
+            currentPlayer = 1;
+            updateScoreDisplay();
+            initBoard();
+            document.getElementById('gameOverOverlay').classList.add('hidden');
+            document.getElementById('player1').textContent = document.getElementById('player1Name').value;
+            document.getElementById('player2').textContent = document.getElementById('player2Name').value;
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (isGameRunning) {
+                isPaused = !isPaused;
+                document.getElementById('pauseBtn').textContent = isPaused ? '▶ 继续' : '⏸ 暂停';
+            }
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            document.getElementById('startBtn').click();
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 400;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#2d3436';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 36px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('泡泡龙对战战绩', canvas.width / 2, 60);
+            
+            ctx.font = '24px Arial';
+            ctx.fillText(`${document.getElementById('player1Name').value}: ${scores[0]} 分`, 150, 150);
+            ctx.fillText(`${document.getElementById('player2Name').value}: ${scores[1]} 分`, 450, 150);
+            
+            let result = '';
+            if (scores[0] > scores[1]) {
+                result = `${document.getElementById('player1Name').value} 获胜!`;
+            } else if (scores[1] > scores[0]) {
+                result = `${document.getElementById('player2Name').value} 获胜!`;
+            } else {
+                result = '平局!';
+            }
+            ctx.fillStyle = '#ff6b6b';
+            ctx.font = 'bold 30px Arial';
+            ctx.fillText(result, canvas.width / 2, 280);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '18px Arial';
+            ctx.fillText('🎮 couple-mini-game', canvas.width / 2, 350);
+            
+            const link = document.createElement('a');
+            link.download = 'bubble_shooter_result.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!isGameRunning || gameOver) return;
+            
+            if (e.key === 'Escape') {
+                document.getElementById('pauseBtn').click();
+                return;
+            }
+            
+            if (isPaused) return;
+            
+            if (currentPlayer === 1) {
+                if (e.key === 'ArrowLeft') angle -= 0.1;
+                if (e.key === 'ArrowRight') angle += 0.1;
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    launchBubble();
+                }
+            } else {
+                if (e.key === 'a' || e.key === 'A') angle -= 0.1;
+                if (e.key === 'd' || e.key === 'D') angle += 0.1;
+                if (e.key === 'w' || e.key === 'W') {
+                    e.preventDefault();
+                    launchBubble();
+                }
+            }
+        });
+
+        gameLoop();
+    </script>
+</body>
+</html>

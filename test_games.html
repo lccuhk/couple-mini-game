@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 双人小游戏测试工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .controls h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .game-card.testing::before {
+            background: linear-gradient(90deg, #f5576c, #f093fb);
+        }
+
+        .game-card.passed::before {
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+        }
+
+        .game-card.failed::before {
+            background: linear-gradient(90deg, #eb3349, #f45c43);
+        }
+
+        .game-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .game-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .game-status {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .game-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .game-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .game-btn-open {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .game-btn-open:hover {
+            background: #e0e0e0;
+        }
+
+        .game-btn-test {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .game-btn-test:hover {
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-icon {
+            font-size: 1.2em;
+        }
+
+        .results-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .results-panel.show {
+            display: block;
+        }
+
+        .results-panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-item.passed {
+            background: #e6f9e6;
+        }
+
+        .result-item.failed {
+            background: #ffe6e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 双人小游戏测试工具</h1>
+            <p>测试21-40号新游戏能否正常启动</p>
+        </div>
+
+        <div class="controls">
+            <h2>⚙️ 测试控制</h2>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="testAll()">
+                    🚀 测试全部
+                </button>
+                <button class="btn btn-success" onclick="testRandom()">
+                    🎲 随机测试10个
+                </button>
+                <button class="btn btn-warning" onclick="resetTests()">
+                    🔄 重置测试
+                </button>
+                <button class="btn btn-info" onclick="showResults()">
+                    📊 查看结果
+                </button>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-total">20</div>
+                    <div class="stat-label">总游戏数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-tested">0</div>
+                    <div class="stat-label">已测试</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-passed">0</div>
+                    <div class="stat-label">✅ 通过</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-failed">0</div>
+                    <div class="stat-label">❌ 失败</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="games-grid" id="games-grid">
+            <!-- 游戏卡片将由JavaScript生成 -->
+        </div>
+
+        <div class="results-panel" id="results-panel">
+            <h2>📊 测试结果</h2>
+            <div id="results-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const games = [
+            { id: 21, file: '21_doudizhu_battle.html', name: '斗地主对战' },
+            { id: 22, file: '22_tetris_battle.html', name: '俄罗斯方块对战' },
+            { id: 23, file: '23_tank_battle.html', name: '坦克大战' },
+            { id: 24, file: '24_linkup_battle.html', name: '连连看对战' },
+            { id: 25, file: '25_basketball_battle.html', name: '篮球对战' },
+            { id: 26, file: '26_soccer_battle.html', name: '足球对战' },
+            { id: 27, file: '27_bubble_shooter_battle.html', name: '泡泡龙对战' },
+            { id: 28, file: '28_match3_battle.html', name: '消消乐对战' },
+            { id: 29, file: '29_sokoban_battle.html', name: '推箱子对战' },
+            { id: 30, file: '30_breakout_battle.html', name: '打砖块对战' },
+            { id: 31, file: '31_racing_battle.html', name: '赛车对战' },
+            { id: 32, file: '32_space_shooter_battle.html', name: '飞行射击对战' },
+            { id: 33, file: '33_bomberman_battle.html', name: '炸弹人对战' },
+            { id: 34, file: '34_hop_battle.html', name: '跳一跳对战' },
+            { id: 35, file: '35_runner_battle.html', name: '跑酷对战' },
+            { id: 36, file: '36_tower_defense_battle.html', name: '塔防对战' },
+            { id: 37, file: '37_gomoku_battle.html', name: '五子棋对战' },
+            { id: 38, file: '38_chinese_chess_battle.html', name: '中国象棋对战' },
+            { id: 39, file: '39_go_battle.html', name: '围棋对战' },
+            { id: 40, file: '40_fishing_battle.html', name: '捕鱼达人对战' }
+        ];
+
+        let testResults = {};
+        let isTesting = false;
+
+        function init() {
+            renderGames();
+            updateStats();
+        }
+
+        function renderGames() {
+            const grid = document.getElementById('games-grid');
+            grid.innerHTML = '';
+
+            games.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.id = `game-${game.id}`;
+                card.innerHTML = `
+                    <span class="game-number">游戏 ${game.id}</span>
+                    <div class="game-name">${game.name}</div>
+                    <div class="game-status" id="status-${game.id}">
+                        <span class="status-icon">⏳</span> 待测试
+                    </div>
+                    <div class="progress-bar" id="progress-${game.id}" style="display:none">
+                        <div class="progress-fill" style="width:0%"></div>
+                    </div>
+                    <div class="game-actions">
+                        <button class="game-btn game-btn-open" onclick="openGame('${game.file}')">
+                            👆 打开
+                        </button>
+                        <button class="game-btn game-btn-test" onclick="testSingle(${game.id})">
+                            ✅ 测试
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openGame(filename) {
+            window.open(`games/${filename}`, '_blank');
+        }
+
+        async function testSingle(gameId) {
+            if (isTesting) return;
+
+            const game = games.find(g => g.id === gameId);
+            if (!game) return;
+
+            const card = document.getElementById(`game-${gameId}`);
+            const statusEl = document.getElementById(`status-${gameId}`);
+            const progressEl = document.getElementById(`progress-${gameId}`);
+
+            card.classList.add('testing');
+            statusEl.innerHTML = '<span class="loading-spinner"></span> 测试中...';
+            progressEl.style.display = 'block';
+
+            try {
+                const response = await fetch(`games/${game.file}`);
+                if (response.ok) {
+                    const text = await response.text();
+                    if (text.includes('DOCTYPE') && text.length > 1000) {
+                        testResults[gameId] = { status: 'passed', file: game.file, name: game.name };
+                        card.classList.remove('testing');
+                        card.classList.add('passed');
+                        statusEl.innerHTML = '<span class="status-icon">✅</span> 通过';
+                    } else {
+                        throw new Error('文件内容不完整');
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                testResults[gameId] = { status: 'failed', file: game.file, name: game.name, error: error.message };
+                card.classList.remove('testing');
+                card.classList.add('failed');
+                statusEl.innerHTML = `<span class="status-icon">❌</span> 失败: ${error.message}`;
+            }
+
+            progressEl.style.display = 'none';
+            updateStats();
+        }
+
+        async function testAll() {
+            if (isTesting) return;
+            isTesting = true;
+
+            for (let i = 0; i < games.length; i++) {
+                await testSingle(games[i].id);
+                const progress = ((i + 1) / games.length) * 100;
+                games.forEach(game => {
+                    const p = document.getElementById(`progress-${game.id}`);
+                    if (p) {
+                        const fill = p.querySelector('.progress-fill');
+                        if (fill) fill.style.width = `${progress}%`;
+                    }
+                });
+            }
+
+            isTesting = false;
+            showResults();
+        }
+
+        async function testRandom() {
+            if (isTesting) return;
+            isTesting = true;
+
+            const shuffled = [...games].sort(() => Math.random() - 0.5).slice(0, 10);
+            
+            for (const game of shuffled) {
+                await testSingle(game.id);
+            }
+
+            isTesting = false;
+            showResults();
+        }
+
+        function resetTests() {
+            testResults = {};
+            renderGames();
+            updateStats();
+            document.getElementById('results-panel').classList.remove('show');
+        }
+
+        function updateStats() {
+            const total = games.length;
+            const tested = Object.keys(testResults).length;
+            const passed = Object.values(testResults).filter(r => r.status === 'passed').length;
+            const failed = Object.values(testResults).filter(r => r.status === 'failed').length;
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-tested').textContent = tested;
+            document.getElementById('stat-passed').textContent = passed;
+            document.getElementById('stat-failed').textContent = failed;
+        }
+
+        function showResults() {
+            const panel = document.getElementById('results-panel');
+            const list = document.getElementById('results-list');
+
+            if (Object.keys(testResults).length === 0) {
+                list.innerHTML = '<p style="color:#666">还没有测试结果，请先运行测试！</p>';
+                panel.classList.add('show');
+                return;
+            }
+
+            list.innerHTML = '';
+            Object.values(testResults).forEach(result => {
+                const item = document.createElement('div');
+                item.className = `result-item ${result.status}`;
+                item.innerHTML = `
+                    <span>
+                        <strong>${result.name}</strong> (${result.file})
+                    </span>
+                    <span>${result.status === 'passed' ? '✅ 通过' : '❌ 失败'}</span>
+                `;
+                list.appendChild(item);
+            });
+
+            panel.classList.add('show');
+        }
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html>

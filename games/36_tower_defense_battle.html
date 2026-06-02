@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔防对战</title>
+    <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --bg-color: #f8f9fa;
+            --text-color: #2d3436;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+        }
+        
+        [data-theme="orange"] {
+            --primary-color: #ff9f43;
+            --secondary-color: #fd79a8;
+        }
+        
+        [data-theme="purple"] {
+            --primary-color: #a29bfe;
+            --secondary-color: #fd79a8;
+        }
+        
+        [data-theme="green"] {
+            --primary-color: #00b894;
+            --secondary-color: #0984e3;
+        }
+        
+        [data-theme="blue"] {
+            --primary-color: #74b9ff;
+            --secondary-color: #00cec9;
+        }
+        
+        [data-theme="pink"] {
+            --primary-color: #fd79a8;
+            --secondary-color: #a29bfe;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #2d3436;
+            --text-color: #ffffff;
+            --card-bg: #343a40;
+            --border-color: #495057;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .theme-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .theme-btn:nth-child(1) { background: linear-gradient(135deg, #ff6b6b, #4ecdc4); }
+        .theme-btn:nth-child(2) { background: linear-gradient(135deg, #ff9f43, #fd79a8); }
+        .theme-btn:nth-child(3) { background: linear-gradient(135deg, #a29bfe, #fd79a8); }
+        .theme-btn:nth-child(4) { background: linear-gradient(135deg, #00b894, #0984e3); }
+        .theme-btn:nth-child(5) { background: linear-gradient(135deg, #74b9ff, #00cec9); }
+        .theme-btn:nth-child(6) { background: linear-gradient(135deg, #fd79a8, #a29bfe); }
+        
+        .dark-toggle {
+            padding: 10px 20px;
+            border: 2px solid var(--primary-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dark-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .player-panel {
+            text-align: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            min-width: 150px;
+        }
+
+        .player-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .player-score {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .gold-count {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #ffd700;
+        }
+
+        .game-area {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .game-board {
+            border: 3px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .turn-indicator {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .pause-btn, .share-btn {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .game-over-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+        }
+
+        .game-over-text {
+            font-size: 48px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .winner-text {
+            font-size: 28px;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .nickname-input {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            width: 100%;
+            text-align: center;
+        }
+
+        .random-theme-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tower-panel {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .tower-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .tower-btn:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+
+        .tower-btn.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">🏰 塔防对战</h1>
+        <div class="theme-controls">
+            <button class="theme-btn" title="红色主题"></button>
+            <button class="theme-btn" title="橙色主题"></button>
+            <button class="theme-btn" title="紫色主题"></button>
+            <button class="theme-btn" title="绿色主题"></button>
+            <button class="theme-btn" title="蓝色主题"></button>
+            <button class="theme-btn" title="粉色主题"></button>
+            <button class="random-theme-btn" title="随机主题">🎲</button>
+            <button class="dark-toggle">🌙</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="player-panel">
+            <input type="text" class="nickname-input" id="player1Name" value="玩家1" maxlength="10">
+            <div class="player-name" id="player1">玩家1</div>
+            <div class="player-score" id="score1">0</div>
+            <div class="gold-count">💰 <span id="gold1">100</span></div>
+        </div>
+
+        <div class="game-area">
+            <canvas id="gameCanvas" width="600" height="500"></canvas>
+            <div class="turn-indicator" id="turnIndicator">准备开始</div>
+            
+            <div class="tower-panel">
+                <button class="tower-btn" id="tower1" title="箭塔 (50金)">🏹</button>
+                <button class="tower-btn" id="tower2" title="炮塔 (80金)">💣</button>
+                <button class="tower-btn" id="tower3" title="魔法塔 (120金)">⚡</button>
+            </div>
+            
+            <div class="controls">
+                <button class="control-btn start-btn" id="startBtn">开始游戏</button>
+                <button class="control-btn pause-btn" id="pauseBtn">⏸ 暂停</button>
+                <button class="control-btn share-btn" id="shareBtn">📤 分享战绩</button>
+            </div>
+            
+            <div class="game-over-overlay hidden" id="gameOverOverlay">
+                <div class="game-over-text">游戏结束!</div>
+                <div class="winner-text" id="winnerText"></div>
+                <button class="control-btn start-btn" id="restartBtn">再玩一次</button>
+            </div>
+        </div>
+
+        <div class="player-panel">
+            <input type="text" class="nickname-input" id="player2Name" value="玩家2" maxlength="10">
+            <div class="player-name" id="player2">玩家2</div>
+            <div class="player-score" id="score2">0</div>
+            <div class="gold-count">💰 <span id="gold2">100</span></div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <p>🎯 玩家1: 点击地图放置防御塔</p>
+        <p>🎯 玩家2: 点击地图放置防御塔</p>
+        <p>🏰 阻止敌人到达对方基地，保护自己的基地</p>
+        <p>⏸ ESC 暂停游戏</p>
+    </div>
+
+    <script>
+        const themes = ['default', 'orange', 'purple', 'green', 'blue', 'pink'];
+        let currentTheme = 0;
+        let isDarkMode = false;
+
+        document.querySelectorAll('.theme-btn').forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                currentTheme = index;
+                document.body.setAttribute('data-theme', themes[index]);
+            });
+        });
+
+        document.querySelector('.random-theme-btn').addEventListener('click', () => {
+            currentTheme = Math.floor(Math.random() * themes.length);
+            document.body.setAttribute('data-theme', themes[currentTheme]);
+        });
+
+        document.querySelector('.dark-toggle').addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+                document.body.setAttribute('data-theme', 'dark');
+            } else {
+                document.body.setAttribute('data-theme', themes[currentTheme]);
+            }
+        });
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const TILE_SIZE = 50;
+        const MAP_WIDTH = 12;
+        const MAP_HEIGHT = 10;
+
+        let gold1 = 100;
+        let gold2 = 100;
+        let lives1 = 20;
+        let lives2 = 20;
+        let score1 = 0;
+        let score2 = 0;
+        
+        let towers = [];
+        let enemies = [];
+        let projectiles = [];
+        
+        let isGameRunning = false;
+        let isPaused = false;
+        let gameWinner = null;
+        let selectedTower = 1;
+        let activePlayer = 1;
+
+        const TOWER_TYPES = [
+            { id: 1, emoji: '🏹', cost: 50, damage: 10, range: 120, speed: 500, color: '#4ecdc4' },
+            { id: 2, emoji: '💣', cost: 80, damage: 25, range: 100, speed: 800, color: '#ff6b6b' },
+            { id: 3, emoji: '⚡', cost: 120, damage: 15, range: 150, speed: 300, color: '#ffd700' }
+        ];
+
+        const ENEMY_TYPES = [
+            { type: 'normal', hp: 50, speed: 1, reward: 10, color: '#8B4513' },
+            { type: 'fast', hp: 30, speed: 2, reward: 15, color: '#00b894' },
+            { type: 'tank', hp: 100, speed: 0.5, reward: 30, color: '#6c5ce7' }
+        ];
+
+        function drawGrid() {
+            ctx.fillStyle = '#2d5a27';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#3d7a37';
+            ctx.lineWidth = 1;
+            for (let x = 0; x <= MAP_WIDTH; x++) {
+                ctx.beginPath();
+                ctx.moveTo(x * TILE_SIZE, 0);
+                ctx.lineTo(x * TILE_SIZE, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y <= MAP_HEIGHT; y++) {
+                ctx.beginPath();
+                ctx.moveTo(0, y * TILE_SIZE);
+                ctx.lineTo(canvas.width, y * TILE_SIZE);
+                ctx.stroke();
+            }
+        }
+
+        function drawBase() {
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillRect(0, canvas.height / 2 - TILE_SIZE, TILE_SIZE * 2, TILE_SIZE * 2);
+            ctx.fillStyle = '#fff';
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🏠', TILE_SIZE, canvas.height / 2 + 15);
+            
+            ctx.fillStyle = '#4ecdc4';
+            ctx.fillRect(canvas.width - TILE_SIZE * 2, canvas.height / 2 - TILE_SIZE, TILE_SIZE * 2, TILE_SIZE * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fillText('🏠', canvas.width - TILE_SIZE, canvas.height / 2 + 15);
+        }
+
+        function drawTower(tower) {
+            const type = TOWER_TYPES.find(t => t.id === tower.type);
+            ctx.fillStyle = type.color;
+            ctx.fillRect(tower.x * TILE_SIZE + 5, tower.y * TILE_SIZE + 5, TILE_SIZE - 10, TILE_SIZE - 10);
+            ctx.fillStyle = '#fff';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(type.emoji, tower.x * TILE_SIZE + TILE_SIZE/2, tower.y * TILE_SIZE + TILE_SIZE/2 + 7);
+        }
+
+        function drawEnemy(enemy) {
+            ctx.fillStyle = enemy.color;
+            ctx.beginPath();
+            ctx.arc(enemy.x, enemy.y, 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${enemy.hp}/${enemy.maxHp}`, enemy.x, enemy.y + 4);
+        }
+
+        function drawProjectile(proj) {
+            ctx.fillStyle = proj.color;
+            ctx.beginPath();
+            ctx.arc(proj.x, proj.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function spawnEnemy() {
+            if (Math.random() < 0.01) {
+                const type = ENEMY_TYPES[Math.floor(Math.random() * ENEMY_TYPES.length)];
+                const isPlayer1Enemy = Math.random() > 0.5;
+                enemies.push({
+                    x: isPlayer1Enemy ? canvas.width + 20 : -20,
+                    y: canvas.height / 2 + (Math.random() - 0.5) * 200,
+                    ...type,
+                    maxHp: type.hp,
+                    targetPlayer: isPlayer1Enemy ? 1 : 2,
+                    progress: 0
+                });
+            }
+        }
+
+        function updateEnemies() {
+            enemies.forEach((enemy, ei) => {
+                if (enemy.targetPlayer === 1) {
+                    enemy.x -= enemy.speed;
+                    if (enemy.x < TILE_SIZE * 2) {
+                        lives1 -= 1;
+                        enemies.splice(ei, 1);
+                        updateLivesDisplay();
+                        checkGameOver();
+                    }
+                } else {
+                    enemy.x += enemy.speed;
+                    if (enemy.x > canvas.width - TILE_SIZE * 2) {
+                        lives2 -= 1;
+                        enemies.splice(ei, 1);
+                        updateLivesDisplay();
+                        checkGameOver();
+                    }
+                }
+            });
+        }
+
+        function updateTowers() {
+            towers.forEach(tower => {
+                if (Date.now - tower.lastFired > tower.fireRate) {
+                    const target = findTarget(tower);
+                    if (target) {
+                        fireProjectile(tower, target);
+                        tower.lastFired = Date.now;
+                    }
+                }
+            });
+        }
+
+        function findTarget(tower) {
+            const towerCenterX = tower.x * TILE_SIZE + TILE_SIZE/2;
+            const towerCenterY = tower.y * TILE_SIZE + TILE_SIZE/2;
+            
+            let closest = null;
+            let closestDist = Infinity;
+            
+            enemies.forEach(enemy => {
+                const dx = enemy.x - towerCenterX;
+                const dy = enemy.y - towerCenterY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist <= tower.range && dist < closestDist) {
+                    closest = enemy;
+                    closestDist = dist;
+                }
+            });
+            
+            return closest;
+        }
+
+        function fireProjectile(tower, target) {
+            const type = TOWER_TYPES.find(t => t.id === tower.type);
+            projectiles.push({
+                x: tower.x * TILE_SIZE + TILE_SIZE/2,
+                y: tower.y * TILE_SIZE + TILE_SIZE/2,
+                targetX: target.x,
+                targetY: target.y,
+                damage: type.damage,
+                speed: type.speed,
+                color: type.color,
+                targetId: target
+            });
+        }
+
+        function updateProjectiles() {
+            projectiles.forEach((proj, pi) => {
+                const dx = proj.targetX - proj.x;
+                const dy = proj.targetY - proj.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < 10) {
+                    proj.targetId.hp -= proj.damage;
+                    projectiles.splice(pi, 1);
+                    
+                    if (proj.targetId.hp <= 0) {
+                        const idx = enemies.indexOf(proj.targetId);
+                        if (idx !== -1) {
+                            if (proj.targetId.targetPlayer === 1) {
+                                gold2 += proj.targetId.reward;
+                                score2 += proj.targetId.reward;
+                            } else {
+                                gold1 += proj.targetId.reward;
+                                score1 += proj.targetId.reward;
+                            }
+                            enemies.splice(idx, 1);
+                            updateGoldDisplay();
+                            updateScoreDisplay();
+                        }
+                    }
+                } else {
+                    proj.x += (dx / dist) * 8;
+                    proj.y += (dy / dist) * 8;
+                }
+            });
+        }
+
+        function placeTower(x, y) {
+            const tileX = Math.floor(x / TILE_SIZE);
+            const tileY = Math.floor(y / TILE_SIZE);
+            
+            if (tileX < 2 || tileX >= MAP_WIDTH - 2 || tileY < 1 || tileY >= MAP_HEIGHT - 1) return false;
+            
+            const occupied = towers.some(t => t.x === tileX && t.y === tileY);
+            if (occupied) return false;
+            
+            const type = TOWER_TYPES.find(t => t.id === selectedTower);
+            const cost = type.cost;
+            
+            if (activePlayer === 1 && gold1 >= cost) {
+                gold1 -= cost;
+            } else if (activePlayer === 2 && gold2 >= cost) {
+                gold2 -= cost;
+            } else {
+                return false;
+            }
+            
+            towers.push({
+                x: tileX,
+                y: tileY,
+                type: selectedTower,
+                lastFired: 0,
+                fireRate: TOWER_TYPES.find(t => t.id === selectedTower).speed,
+                range: TOWER_TYPES.find(t => t.id === selectedTower).range,
+                owner: activePlayer
+            });
+            
+            updateGoldDisplay();
+            activePlayer = activePlayer === 1 ? 2 : 1;
+            return true;
+        }
+
+        function updateGoldDisplay() {
+            document.getElementById('gold1').textContent = gold1;
+            document.getElementById('gold2').textContent = gold2;
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('score1').textContent = score1;
+            document.getElementById('score2').textContent = score2;
+        }
+
+        function updateLivesDisplay() {
+            document.getElementById('turnIndicator').textContent = 
+                `${document.getElementById('player1Name').value}: ❤️${lives1} | ${document.getElementById('player2Name').value}: ❤️${lives2}`;
+        }
+
+        function checkGameOver() {
+            if (lives1 <= 0) {
+                gameWinner = 2;
+                endGame();
+            } else if (lives2 <= 0) {
+                gameWinner = 1;
+                endGame();
+            }
+        }
+
+        function endGame() {
+            isGameRunning = false;
+            showGameOver();
+        }
+
+        function showGameOver() {
+            const overlay = document.getElementById('gameOverOverlay');
+            const winnerText = document.getElementById('winnerText');
+            
+            const winner = gameWinner === 1 ? document.getElementById('player1Name').value : document.getElementById('player2Name').value;
+            winnerText.textContent = `${winner} 获胜!`;
+            overlay.classList.remove('hidden');
+        }
+
+        canvas.addEventListener('click', (e) => {
+            if (!isGameRunning || isPaused) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            placeTower(x, y);
+        });
+
+        document.querySelectorAll('.tower-btn').forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                selectedTower = index + 1;
+                document.querySelectorAll('.tower-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+            });
+        });
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (isGameRunning && !isPaused) {
+                drawGrid();
+                drawBase();
+                
+                towers.forEach(drawTower);
+                enemies.forEach(drawEnemy);
+                projectiles.forEach(drawProjectile);
+                
+                spawnEnemy();
+                updateEnemies();
+                updateTowers();
+                updateProjectiles();
+            } else if (isPaused) {
+                drawGrid();
+                drawBase();
+                towers.forEach(drawTower);
+                enemies.forEach(drawEnemy);
+                projectiles.forEach(drawProjectile);
+                
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 36px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('游戏暂停', canvas.width / 2, canvas.height / 2);
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            isGameRunning = true;
+            isPaused = false;
+            gameWinner = null;
+            activePlayer = 1;
+            
+            gold1 = 100;
+            gold2 = 100;
+            lives1 = 20;
+            lives2 = 20;
+            score1 = 0;
+            score2 = 0;
+            towers = [];
+            enemies = [];
+            projectiles = [];
+            
+            updateGoldDisplay();
+            updateScoreDisplay();
+            updateLivesDisplay();
+            document.getElementById('gameOverOverlay').classList.add('hidden');
+            document.getElementById('player1').textContent = document.getElementById('player1Name').value;
+            document.getElementById('player2').textContent = document.getElementById('player2Name').value;
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (isGameRunning) {
+                isPaused = !isPaused;
+                document.getElementById('pauseBtn').textContent = isPaused ? '▶ 继续' : '⏸ 暂停';
+            }
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            document.getElementById('startBtn').click();
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 400;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#2d3436';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 36px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('塔防对战战绩', canvas.width / 2, 60);
+            
+            ctx.font = '24px Arial';
+            ctx.fillText(`${document.getElementById('player1Name').value}: ${score1}分`, 150, 150);
+            ctx.fillText(`${document.getElementById('player2Name').value}: ${score2}分`, 450, 150);
+            
+            ctx.fillStyle = '#4ecdc4';
+            ctx.fillRect(80, 200, 120, 40);
+            ctx.fillStyle = '#fff';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(`❤️: ${lives1} 💰: ${gold1}`, 90, 228);
+            
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillRect(400, 200, 120, 40);
+            ctx.fillStyle = '#fff';
+            ctx.fillText(`❤️: ${lives2} 💰: ${gold2}`, 410, 228);
+            
+            let result = '';
+            if (lives1 > lives2) {
+                result = `${document.getElementById('player1Name').value} 领先!`;
+            } else if (lives2 > lives1) {
+                result = `${document.getElementById('player2Name').value} 领先!`;
+            } else {
+                result = '势均力敌!';
+            }
+            ctx.fillStyle = '#ff6b6b';
+            ctx.font = 'bold 30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(result, canvas.width / 2, 300);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '18px Arial';
+            ctx.fillText('🎮 couple-mini-game', canvas.width / 2, 360);
+            
+            const link = document.createElement('a');
+            link.download = 'tower_defense_result.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!isGameRunning) return;
+            
+            if (e.key === 'Escape') {
+                document.getElementById('pauseBtn').click();
+                return;
+            }
+            
+            if (e.key >= '1' && e.key <= '3') {
+                selectedTower = parseInt(e.key);
+                document.querySelectorAll('.tower-btn').forEach(b => b.classList.remove('selected'));
+                document.getElementById(`tower${e.key}`).classList.add('selected');
+            }
+        });
+
+        gameLoop();
+    </script>
+</body>
+</html>

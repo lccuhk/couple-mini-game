@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跳一跳对战</title>
+    <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --bg-color: #f8f9fa;
+            --text-color: #2d3436;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+        }
+        
+        [data-theme="orange"] {
+            --primary-color: #ff9f43;
+            --secondary-color: #fd79a8;
+        }
+        
+        [data-theme="purple"] {
+            --primary-color: #a29bfe;
+            --secondary-color: #fd79a8;
+        }
+        
+        [data-theme="green"] {
+            --primary-color: #00b894;
+            --secondary-color: #0984e3;
+        }
+        
+        [data-theme="blue"] {
+            --primary-color: #74b9ff;
+            --secondary-color: #00cec9;
+        }
+        
+        [data-theme="pink"] {
+            --primary-color: #fd79a8;
+            --secondary-color: #a29bfe;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #2d3436;
+            --text-color: #ffffff;
+            --card-bg: #343a40;
+            --border-color: #495057;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .theme-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .theme-btn:nth-child(1) { background: linear-gradient(135deg, #ff6b6b, #4ecdc4); }
+        .theme-btn:nth-child(2) { background: linear-gradient(135deg, #ff9f43, #fd79a8); }
+        .theme-btn:nth-child(3) { background: linear-gradient(135deg, #a29bfe, #fd79a8); }
+        .theme-btn:nth-child(4) { background: linear-gradient(135deg, #00b894, #0984e3); }
+        .theme-btn:nth-child(5) { background: linear-gradient(135deg, #74b9ff, #00cec9); }
+        .theme-btn:nth-child(6) { background: linear-gradient(135deg, #fd79a8, #a29bfe); }
+        
+        .dark-toggle {
+            padding: 10px 20px;
+            border: 2px solid var(--primary-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dark-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .player-panel {
+            text-align: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            min-width: 150px;
+        }
+
+        .player-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .player-score {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .game-area {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .game-board {
+            border: 3px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .turn-indicator {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .pause-btn, .share-btn {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .game-over-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+        }
+
+        .game-over-text {
+            font-size: 48px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .winner-text {
+            font-size: 28px;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .nickname-input {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            width: 100%;
+            text-align: center;
+        }
+
+        .random-theme-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .power-bar {
+            width: 200px;
+            height: 15px;
+            background: #ddd;
+            border-radius: 10px;
+            margin: 10px auto;
+            overflow: hidden;
+        }
+
+        .power-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #ff6b6b);
+            transition: width 0.1s;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">🏃 跳一跳对战</h1>
+        <div class="theme-controls">
+            <button class="theme-btn" title="红色主题"></button>
+            <button class="theme-btn" title="橙色主题"></button>
+            <button class="theme-btn" title="紫色主题"></button>
+            <button class="theme-btn" title="绿色主题"></button>
+            <button class="theme-btn" title="蓝色主题"></button>
+            <button class="theme-btn" title="粉色主题"></button>
+            <button class="random-theme-btn" title="随机主题">🎲</button>
+            <button class="dark-toggle">🌙</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="player-panel">
+            <input type="text" class="nickname-input" id="player1Name" value="玩家1" maxlength="10">
+            <div class="player-name" id="player1">玩家1</div>
+            <div class="player-score" id="score1">0</div>
+            <div class="power-bar"><div class="power-fill" id="power1"></div></div>
+        </div>
+
+        <div class="game-area">
+            <canvas id="gameCanvas" width="600" height="500"></canvas>
+            <div class="turn-indicator" id="turnIndicator">准备开始</div>
+            
+            <div class="controls">
+                <button class="control-btn start-btn" id="startBtn">开始游戏</button>
+                <button class="control-btn pause-btn" id="pauseBtn">⏸ 暂停</button>
+                <button class="control-btn share-btn" id="shareBtn">📤 分享战绩</button>
+            </div>
+            
+            <div class="game-over-overlay hidden" id="gameOverOverlay">
+                <div class="game-over-text">游戏结束!</div>
+                <div class="winner-text" id="winnerText"></div>
+                <button class="control-btn start-btn" id="restartBtn">再玩一次</button>
+            </div>
+        </div>
+
+        <div class="player-panel">
+            <input type="text" class="nickname-input" id="player2Name" value="玩家2" maxlength="10">
+            <div class="player-name" id="player2">玩家2</div>
+            <div class="player-score" id="score2">0</div>
+            <div class="power-bar"><div class="power-fill" id="power2"></div></div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <p>🎯 玩家1: 按住 空格 蓄力，松开发射</p>
+        <p>🎯 玩家2: 按住 Enter 蓄力，松开发射</p>
+        <p>🏃 跳到下一个平台获得分数，掉下去则游戏结束</p>
+        <p>⏸ ESC 暂停游戏</p>
+    </div>
+
+    <script>
+        const themes = ['default', 'orange', 'purple', 'green', 'blue', 'pink'];
+        let currentTheme = 0;
+        let isDarkMode = false;
+
+        document.querySelectorAll('.theme-btn').forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                currentTheme = index;
+                document.body.setAttribute('data-theme', themes[index]);
+            });
+        });
+
+        document.querySelector('.random-theme-btn').addEventListener('click', () => {
+            currentTheme = Math.floor(Math.random() * themes.length);
+            document.body.setAttribute('data-theme', themes[currentTheme]);
+        });
+
+        document.querySelector('.dark-toggle').addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+                document.body.setAttribute('data-theme', 'dark');
+            } else {
+                document.body.setAttribute('data-theme', themes[currentTheme]);
+            }
+        });
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const PLAYER_SIZE = 30;
+        const PLATFORM_WIDTH = 80;
+        const PLATFORM_HEIGHT = 20;
+        const GRAVITY = 0.5;
+        const MAX_POWER = 15;
+
+        let player1 = { x: 50, y: 400, vx: 0, vy: 0, isJumping: false, isCharging: false, power: 0 };
+        let player2 = { x: 550, y: 400, vx: 0, vy: 0, isJumping: false, isCharging: false, power: 0 };
+        let platforms = [];
+        
+        let isGameRunning = false;
+        let isPaused = false;
+        let gameWinner = null;
+        let activePlayer = 1;
+
+        function initPlatforms() {
+            platforms = [];
+            platforms.push({ x: 20, y: 450, width: 120, color: '#4ecdc4' });
+            platforms.push({ x: 160, y: 400, width: 100, color: '#ff6b6b' });
+            platforms.push({ x: 300, y: 350, width: 90, color: '#a29bfe' });
+            platforms.push({ x: 440, y: 300, width: 100, color: '#00b894' });
+            platforms.push({ x: 550, y: 250, width: 100, color: '#74b9ff' });
+        }
+
+        function drawBackground() {
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#E0F7FA');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < 5; i++) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.beginPath();
+                ctx.arc(50 + i * 130, 30 + (i % 3) * 20, 15, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawPlatform(platform) {
+            ctx.fillStyle = platform.color;
+            ctx.fillRect(platform.x, platform.y, platform.width, PLATFORM_HEIGHT);
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillRect(platform.x + 5, platform.y + 5, platform.width - 10, 5);
+            
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(platform.x, platform.y, platform.width, PLATFORM_HEIGHT);
+        }
+
+        function drawPlayer(x, y, color, isCharging, power) {
+            ctx.save();
+            
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, PLAYER_SIZE/2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(x - 5, y - 3, 4, 0, Math.PI * 2);
+            ctx.arc(x + 5, y - 3, 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(x - 5, y - 3, 2, 0, Math.PI * 2);
+            ctx.arc(x + 5, y - 3, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            if (isCharging) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(x, y, PLAYER_SIZE/2 + power * 2, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
+
+        function updatePlayer(player) {
+            if (player.isJumping) {
+                player.vy += GRAVITY;
+                player.x += player.vx;
+                player.y += player.vy;
+                
+                for (const platform of platforms) {
+                    if (player.y + PLAYER_SIZE/2 >= platform.y && 
+                        player.y + PLAYER_SIZE/2 <= platform.y + PLATFORM_HEIGHT &&
+                        player.x >= platform.x && 
+                        player.x <= platform.x + platform.width &&
+                        player.vy > 0) {
+                        player.y = platform.y - PLAYER_SIZE/2;
+                        player.vy = 0;
+                        player.isJumping = false;
+                        player.score += 100;
+                        updateScoreDisplay();
+                        
+                        const nextPlatforms = platforms.filter(p => p.x > player.x);
+                        if (nextPlatforms.length === 0) {
+                            gameWinner = player === player1 ? 1 : 2;
+                            endGame();
+                        }
+                        break;
+                    }
+                }
+                
+                if (player.y > canvas.height) {
+                    gameWinner = player === player1 ? 2 : 1;
+                    endGame();
+                }
+            }
+        }
+
+        function jump(player, power) {
+            if (player.isJumping || player.isCharging) return;
+            
+            const nextPlatform = platforms.find(p => p.x > player.x);
+            if (!nextPlatform) return;
+            
+            const dx = (nextPlatform.x + nextPlatform.width/2) - player.x;
+            const dy = nextPlatform.y - player.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            player.vx = (dx / dist) * power;
+            player.vy = (dy / dist) * power - 5;
+            player.isJumping = true;
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('score1').textContent = player1.score;
+            document.getElementById('score2').textContent = player2.score;
+        }
+
+        function updatePowerDisplay() {
+            document.getElementById('power1').style.width = `${(player1.power / MAX_POWER) * 100}%`;
+            document.getElementById('power2').style.width = `${(player2.power / MAX_POWER) * 100}%`;
+        }
+
+        function endGame() {
+            isGameRunning = false;
+            showGameOver();
+        }
+
+        function showGameOver() {
+            const overlay = document.getElementById('gameOverOverlay');
+            const winnerText = document.getElementById('winnerText');
+            
+            const winner = gameWinner === 1 ? document.getElementById('player1Name').value : document.getElementById('player2Name').value;
+            winnerText.textContent = `${winner} 获胜!`;
+            overlay.classList.remove('hidden');
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (isGameRunning && !isPaused) {
+                drawBackground();
+                
+                platforms.forEach(drawPlatform);
+                
+                drawPlayer(player1.x, player1.y, '#4ecdc4', player1.isCharging, player1.power);
+                drawPlayer(player2.x, player2.y, '#ff6b6b', player2.isCharging, player2.power);
+                
+                updatePlayer(player1);
+                updatePlayer(player2);
+                
+                if (player1.isCharging) {
+                    player1.power = Math.min(player1.power + 0.3, MAX_POWER);
+                    updatePowerDisplay();
+                }
+                
+                if (player2.isCharging) {
+                    player2.power = Math.min(player2.power + 0.3, MAX_POWER);
+                    updatePowerDisplay();
+                }
+                
+                const currentPlayer = player1.isJumping ? 2 : player2.isJumping ? 1 : activePlayer;
+                document.getElementById('turnIndicator').textContent = 
+                    `${currentPlayer === 1 ? document.getElementById('player1Name').value : document.getElementById('player2Name').value} 的回合`;
+            } else if (isPaused) {
+                drawBackground();
+                platforms.forEach(drawPlatform);
+                drawPlayer(player1.x, player1.y, '#4ecdc4', false, 0);
+                drawPlayer(player2.x, player2.y, '#ff6b6b', false, 0);
+                
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 36px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('游戏暂停', canvas.width / 2, canvas.height / 2);
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            isGameRunning = true;
+            isPaused = false;
+            gameWinner = null;
+            activePlayer = 1;
+            
+            initPlatforms();
+            player1 = { x: 80, y: 420, vx: 0, vy: 0, isJumping: false, isCharging: false, power: 0, score: 0 };
+            player2 = { x: 500, y: 230, vx: 0, vy: 0, isJumping: false, isCharging: false, power: 0, score: 0 };
+            
+            updateScoreDisplay();
+            updatePowerDisplay();
+            document.getElementById('gameOverOverlay').classList.add('hidden');
+            document.getElementById('player1').textContent = document.getElementById('player1Name').value;
+            document.getElementById('player2').textContent = document.getElementById('player2Name').value;
+            document.getElementById('turnIndicator').textContent = `${document.getElementById('player1Name').value} 的回合`;
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            if (isGameRunning) {
+                isPaused = !isPaused;
+                document.getElementById('pauseBtn').textContent = isPaused ? '▶ 继续' : '⏸ 暂停';
+            }
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            document.getElementById('startBtn').click();
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 400;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#2d3436';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 36px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('跳一跳对战战绩', canvas.width / 2, 60);
+            
+            ctx.font = '24px Arial';
+            ctx.fillText(`${document.getElementById('player1Name').value}: ${player1.score}分`, 150, 150);
+            ctx.fillText(`${document.getElementById('player2Name').value}: ${player2.score}分`, 450, 150);
+            
+            ctx.fillStyle = '#4ecdc4';
+            ctx.beginPath();
+            ctx.arc(150, 250, 25, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px Arial';
+            ctx.fillText('P1', 145, 255);
+            
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(450, 250, 25, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.fillText('P2', 445, 255);
+            
+            let result = '';
+            if (player1.score > player2.score) {
+                result = `${document.getElementById('player1Name').value} 领先!`;
+            } else if (player2.score > player1.score) {
+                result = `${document.getElementById('player2Name').value} 领先!`;
+            } else {
+                result = '势均力敌!';
+            }
+            ctx.fillStyle = '#ff6b6b';
+            ctx.font = 'bold 30px Arial';
+            ctx.fillText(result, canvas.width / 2, 320);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '18px Arial';
+            ctx.fillText('🎮 couple-mini-game', canvas.width / 2, 370);
+            
+            const link = document.createElement('a');
+            link.download = 'hop_result.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!isGameRunning) return;
+            
+            if (e.key === 'Escape') {
+                document.getElementById('pauseBtn').click();
+                return;
+            }
+            
+            if (isPaused) return;
+            
+            if (e.key === ' ' && !player1.isJumping) {
+                player1.isCharging = true;
+                e.preventDefault();
+            }
+            
+            if (e.key === 'Enter' && !player2.isJumping) {
+                player2.isCharging = true;
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (!isGameRunning || isPaused) return;
+            
+            if (e.key === ' ' && player1.isCharging) {
+                player1.isCharging = false;
+                jump(player1, player1.power);
+                player1.power = 0;
+                updatePowerDisplay();
+                activePlayer = 2;
+            }
+            
+            if (e.key === 'Enter' && player2.isCharging) {
+                player2.isCharging = false;
+                jump(player2, player2.power);
+                player2.power = 0;
+                updatePowerDisplay();
+                activePlayer = 1;
+            }
+        });
+
+        initPlatforms();
+        gameLoop();
+    </script>
+</body>
+</html>
