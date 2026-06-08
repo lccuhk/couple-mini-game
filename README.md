@@ -1,9 +1,9 @@
 # 🎮 双人小游戏合集 - Couple Mini Games
 
-> 专为情侣和朋友设计的 20 款双人本地对战小游戏，纯 HTML/CSS/JavaScript 实现，无需安装，打开即玩！
+> 专为情侣和朋友设计的 40 款双人本地对战小游戏，纯 HTML/CSS/JavaScript 实现，无需安装，打开即玩！
 
 ![GitHub](https://img.shields.io/badge/GitHub-lccuhk%2Fcouple--mini--game-blue)
-![Games](https://img.shields.io/badge/游戏数量-20款-green)
+![Games](https://img.shields.io/badge/游戏数量-40款-green)
 ![Tech](https://img.shields.io/badge/技术栈-HTML%2FCSS%2FJS-orange)
 ![Themes](https://img.shields.io/badge/主题数量-12种-purple)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
@@ -260,6 +260,10 @@ npx serve .
 couple-mini-game/
 ├── index.html              # 主页导航
 ├── README.md               # 项目说明
+├── TEST_REPORT_40_GAMES.md # 40款游戏测试报告
+├── test_games.py           # 游戏测试脚本
+├── test_games.html         # 游戏测试页面
+├── TEST_GUIDE.md           # 测试使用指南
 ├── .gitignore             # Git 忽略配置
 ├── .nojekyll              # 禁用 GitHub Pages Jekyll 构建
 └── games/                  # 游戏目录
@@ -282,7 +286,27 @@ couple-mini-game/
     ├── 17_monopoly_battle.html  # 🏠 大富翁
     ├── 18_bowling_battle.html   # 🎳 保龄球对战
     ├── 19_badminton_battle.html # 🏸 羽毛球对战
-    └── 20_pictionary_battle.html # 🎨 你画我猜
+    ├── 20_pictionary_battle.html # 🎨 你画我猜
+    ├── 21_doudizhu_battle.html  # 🎴 斗地主对战
+    ├── 22_tetris_battle.html    # 🧱 俄罗斯方块对战
+    ├── 23_tank_battle.html      # 🚀 坦克大战
+    ├── 24_linkup_battle.html    # 🔗 连连看对战
+    ├── 25_basketball_battle.html # 🏀 篮球对战
+    ├── 26_soccer_battle.html    # ⚽ 足球对战
+    ├── 27_bubble_shooter_battle.html # 🫧 泡泡龙对战
+    ├── 28_match3_battle.html    # 💎 消消乐对战
+    ├── 29_sokoban_battle.html   # 📦 推箱子对战
+    ├── 30_breakout_battle.html  # 🧱 打砖块对战
+    ├── 31_racing_battle.html    # 🏎️ 赛车对战
+    ├── 32_space_shooter_battle.html # 🚀 飞行射击对战
+    ├── 33_bomberman_battle.html # 💣 炸弹人对战
+    ├── 34_hop_battle.html       # 🎮 跳一跳对战
+    ├── 35_runner_battle.html    # 🏃 跑酷对战
+    ├── 36_tower_defense_battle.html # 🏰 塔防对战
+    ├── 37_gomoku_battle.html    # ⚫⚪ 五子棋对战
+    ├── 38_chinese_chess_battle.html # ♟️ 中国象棋对战
+    ├── 39_go_battle.html        # ⚫⚪ 围棋对战
+    └── 40_fishing_battle.html   # 🎣 捕鱼达人对战
 ```
 
 ---
