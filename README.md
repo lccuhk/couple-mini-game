@@ -1,12 +1,20 @@
 # 🎮 双人小游戏合集 - Couple Mini Games
 
-> 专为情侣和朋友设计的 40 款双人本地对战小游戏，纯 HTML/CSS/JavaScript 实现，无需安装，打开即玩！
+<p align="center">
+  <img src="https://img.shields.io/github/stars/lccuhk/couple-mini-game?style=for-the-badge&color=00D9FF" />
+  <img src="https://img.shields.io/github/forks/lccuhk/couple-mini-game?style=for-the-badge&color=00FF88" />
+  <img src="https://img.shields.io/github/issues/lccuhk/couple-mini-game?style=for-the-badge&color=FF6B6B" />
+  <img src="https://img.shields.io/github/license/lccuhk/couple-mini-game?style=for-the-badge&color=FFD93D" />
+  <img src="https://img.shields.io/github/last-commit/lccuhk/couple-mini-game?style=for-the-badge&color=9B59B6" />
+</p>
 
-![GitHub](https://img.shields.io/badge/GitHub-lccuhk%2Fcouple--mini--game-blue)
-![Games](https://img.shields.io/badge/游戏数量-40款-green)
-![Tech](https://img.shields.io/badge/技术栈-HTML%2FCSS%2FJS-orange)
-![Themes](https://img.shields.io/badge/主题数量-12种-purple)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+<p align="center">
+  <img src="https://img.shields.io/badge/🎮_游戏数量-41款-green?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/🛠_技术栈-HTML%2FCSS%2FJS-orange?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/🎨_主题数量-12种-purple?style=for-the-badge" />
+</p>
+
+> 专为情侣和朋友设计的 40+ 款双人本地对战小游戏，纯 HTML/CSS/JavaScript 实现，无需安装，打开即玩！
 
 ---
 
