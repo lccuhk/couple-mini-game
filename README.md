@@ -16,6 +16,12 @@
 
 > 专为情侣和朋友设计的 40+ 款双人本地对战小游戏，纯 HTML/CSS/JavaScript 实现，无需安装，打开即玩！
 
+## 🖼️ 项目预览
+
+<p align="center">
+  <img src="docs/images/preview.svg" alt="Couple Mini Games Preview" width="100%" style="border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);" />
+</p>
+
 ---
 
 ## 🎯 游戏列表
