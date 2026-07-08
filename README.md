@@ -14,6 +14,15 @@
   <img src="https://img.shields.io/badge/🎨_主题数量-12种-purple?style=for-the-badge" />
 </p>
 
+<p align="center">
+  <a href="https://lccuhk.github.io/couple-mini-game/">
+    <img src="https://img.shields.io/badge/🚀_在线游玩-GitHub_Pages-00D9FF?style=for-the-badge" />
+  </a>
+  <a href="https://github.com/lccuhk/couple-mini-game">
+    <img src="https://img.shields.io/badge/📂_查看源码-GitHub-00FF88?style=for-the-badge" />
+  </a>
+</p>
+
 > 专为情侣和朋友设计的 40+ 款双人本地对战小游戏，纯 HTML/CSS/JavaScript 实现，无需安装，打开即玩！
 
 ## 🖼️ 项目预览
