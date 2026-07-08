@@ -145,6 +145,12 @@
 |------|------|------|------|
 | 40 | [捕鱼达人对战](games/40_fishing_battle.html) | 🎣 | 捕鱼达人，控制鱼竿钓鱼，不同鱼有不同分值，比拼收获 |
 
+### ⚔️ 动作格斗
+
+| 序号 | 游戏 | 图标 | 描述 |
+|------|------|------|------|
+| 41 | [霓虹光剑对战](games/41_neon_saber_battle.html) | 🗡️ | 霓虹风格光剑对战，双人格斗，比拼反应和技巧 |
+
 ---
 
 ## 🚀 快速开始
@@ -394,7 +400,8 @@ couple-mini-game/
     ├── 37_gomoku_battle.html    # ⚫⚪ 五子棋对战
     ├── 38_chinese_chess_battle.html # ♟️ 中国象棋对战
     ├── 39_go_battle.html        # ⚫⚪ 围棋对战
-    └── 40_fishing_battle.html   # 🎣 捕鱼达人对战
+    ├── 40_fishing_battle.html   # 🎣 捕鱼达人对战
+    └── 41_neon_saber_battle.html  # 🗡️ 霓虹光剑对战
 ```
 
 ---
